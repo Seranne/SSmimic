@@ -1,0 +1,37 @@
+# Hydromorphone
+
+CREATE VIEW Hydromorphone AS
+SELECT subject_id, hadm_id, startdate, enddate, drug, formulary_drug_cd, drug_name_generic, form_unit_disp, route
+FROM prescriptions
+WHERE drug like '%Hydromorphone%' or formulary_drug_cd like '%HYDR%'
+and not drug like '%cortisone%' and not drug like '%oxyzine%' and not drug like '%Westcort%';
+
+# Percocet
+
+CREATE VIEW Percocet AS
+SELECT subject_id, hadm_id, startdate, enddate, drug, formulary_drug_cd, drug_name_generic, form_unit_disp, route
+FROM prescriptions
+WHERE drug like '%perc%' or formulary_drug_cd like '%PERC%';
+
+# Oxycodone 
+
+CREATE VIEW Oxycodone AS 
+SELECT subject_id, hadm_id, startdate, enddate, drug, formulary_drug_cd, drug_name_generic, form_unit_disp, route
+FROM prescriptions
+WHERE drug like '%oxyco%' or formulary_drug_cd like '%OXYCO%';
+
+# Morphine
+
+CREATE VIEW Morphine AS
+SELECT subject_id, hadm_id, startdate, enddate, drug, formulary_drug_cd, drug_name_generic, form_unit_disp, route
+FROM prescriptions
+WHERE drug like '%Morph%' or formulary_drug_cd like '%MORP%';
+
+# Fentanyl 
+
+CREATE VIEW Fentanyl AS
+SELECT subject_id, hadm_id, startdate, enddate, drug, formulary_drug_cd, drug_name_generic, form_unit_disp, route
+FROM prescriptions
+WHERE drug like '%FENT%' or formulary_drug_cd like '%FENT%';
+
+
