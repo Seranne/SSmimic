@@ -1,0 +1,17 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(readr)
+main_table <- read_csv("D:/Desktop/ss hst project/main.table.csv")
+years <- read_csv("D:/Desktop/ss hst project/years.csv")
+cohort<- merge(main_table,years,by="hadm_id")
+write.csv(cohort, file = "cohort.csv")
+```
+

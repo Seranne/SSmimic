@@ -34,11 +34,21 @@ dbGetQuery(con, "set search_path to mimiciii")
 ```
 ```{r}
 fentanyl <- dbGetQuery(con, "select * from Fentanyl")
-View(fentanyl)
 #colnames(icu_stay_table) <- c("subject_id", "hadm_id", "icustay_id", "intime", "icu_los")
 ```
 
 ```{r}
+morphine <- dbGetQuery(con, "select * from Morphine")
+oxycodone <- dbGetQuery(con, "select * from Oxycodone")
+percocet <- dbGetQuery(con, "select * from Percocet")
+hydromorphone <- dbGetQuery(con, "select * from Hydromorphone")
+```
 
+```{r}
+write.csv(fentanyl, file = "Fentanyl.csv")
+write.csv(morphine, file = "Morphine.csv")
+write.csv(oxycodone, file = "Oxycodone.csv")
+write.csv(percocet, file = "Percocet.csv")
+write.csv(percocet, file = "Hydromorphone.csv")
 ```
 
