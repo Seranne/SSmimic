@@ -1,0 +1,44 @@
+---
+title: "MedFentanyl"
+author: "Shravanthi Seshasayee"
+date: "22 November 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(mgcv)
+library(dplyr)
+# install.packages("RPostgreSQL") ##Install package if needed
+require("RPostgreSQL")
+library(stringr)
+```
+
+## Background
+The following markdown is designed to search through the mimic database and find all patients who underwent CABG procedure. These patients will be found using CPT codes. The corresponding patients and there associated pain levels will also be searched for. We will use the MIMIC database to find additional factors such as medications used to sedate the pateint, surgical complications. Our goal is to see if these pain levels are potentially associated with worse patient outcomes. The outcomes of interest are hospital length of stay, 30 day mortality rate, and 1 year mortality rate. 
+
+## Analysis Table Build
+The first chunk of code allows R to conenct to MIMIC database 
+```{r echo = F}
+# loads the PostgreSQL driver
+drv <- dbDriver("PostgreSQL") 
+# creates a connection to the postgres database (MIMIC)
+# note that "con" will be used later in each connection to the database
+con <- dbConnect(drv, dbname = "mimic",
+                 host = "localhost", port = 5432,
+                 user = "postgres", password = "postgres") # password and username were specific to my 
+                                          # computer, removed here
+
+dbGetQuery(con, "set search_path to mimiciii")
+```
+```{r}
+fentanyl <- dbGetQuery(con, "select * from Fentanyl")
+View(fentanyl)
+#colnames(icu_stay_table) <- c("subject_id", "hadm_id", "icustay_id", "intime", "icu_los")
+```
+
+```{r}
+
+```
+
