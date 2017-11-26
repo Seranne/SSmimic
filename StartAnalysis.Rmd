@@ -1,0 +1,16 @@
+---
+title: "Analysis"
+output: html_document
+---
+
+```{r}
+library(readr)
+opioid <- read_csv("~/SSmimic/Medication/opioid.csv")
+cohort <- read_csv("~/SSmimic/Cohort/cohort.csv")
+
+table<- merge(cohort,opioid, "subject_id")
+table2<- table[!(is.na(table$max_pain) | table$max_pain=="0"), ]
+finaltable<-table2[!(is.na(table2$med.pain) | table2$med.pain=="0"), ]
+write.csv(finaltable,file = "finaltable.csv")
+```
+
