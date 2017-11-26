@@ -21,5 +21,8 @@ Perco <- Percocet %>% distinct(hadm_id, .keep_all = TRUE)
 
 #create combined opioid medication table
 opioid <- rbind(Fent,Hydrom, Morph, Oxycod, Perco)
+
+#create csv
+write.csv(opioid, file = "opioid.csv")
 ```
 
