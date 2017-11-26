@@ -19,12 +19,12 @@ sum(is.na(finaltable$formulary_drug_cd))
 
 #create  table with only IV drug presiscriptions and remove duplicated hadm_id
 
-IVtable<- finaltable[(finaltable$route == "IV") |(finaltable$route == "IV DRIP") , ]
+IVtable<- finaltable[(finaltable$route == "IV") |(finaltable$route == "IV DRIP")|(finaltable$route == "IVPCA") , ]
 IVtable_nodup<-  IVtable %>% distinct(hadm_id, .keep_all = TRUE)
 
 #create  table with NO IV drug presiscriptions and remove duplicated hadm_id
 
-oralopioid<- finaltable[!(finaltable$route == "IV") |!(finaltable$route == "IV DRIP") , ]
+oralopioid<- finaltable[!((finaltable$route == "IV") |(finaltable$route == "IV DRIP")|(finaltable$route == "IVPCA")), ]
 oralopioid_nodup<-  oralopioid %>% distinct(hadm_id, .keep_all = TRUE)
 
 #write csv - will still have duplicated hadm_id, (if one patients recieved multiple opioids)
