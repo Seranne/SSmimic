@@ -4,13 +4,33 @@ output: html_document
 ---
 
 ```{r}
+library(tidyverse)
 library(readr)
 opioid <- read_csv("~/SSmimic/Medication/opioid.csv")
 cohort <- read_csv("~/SSmimic/Cohort/cohort.csv")
 
-table<- merge(cohort,opioid, "subject_id")
-table2<- table[!(is.na(table$max_pain) | table$max_pain=="0"), ]
-finaltable<-table2[!(is.na(table2$med.pain) | table2$med.pain=="0"), ]
+#merger the tables to ease analysis
+
+table<- merge(cohort,opioid, "hadm_id", all.x = TRUE)
+table$subject_id<- table$hadm_id.x
+table$hadm_id.y<- NULL
+table$hadm_id.c<- NULL
+
+#the table now has more that 120k observations -  patients without reported pain scores are being added to the table, therefore will remove ll rows where median or max reported pain is 0
+
+finaltable<- table[!(is.na(table$max_pain)), ]
+
+#create  table with only IV drug presiscriptions and remove duplicated hadm_id
+
+IVtable<- finaltable[(finaltable$route == "IV") |(finaltable$route == "IV DRIP") , ]
+IVtable_nodup<-  IVtable %>% distinct(hadm_id, .keep_all = TRUE)
+
+#create  table with NO IV drug presiscriptions and remove duplicated hadm_id
+
+oralopioid<- finaltable[!(finaltable$route == "IV") |!(finaltable$route == "IV DRIP") , ]
+oralopioid_nodup<-  oralopioid %>% distinct(hadm_id, .keep_all = TRUE)
+
+#write csv - will still have duplicated hadm_id, (if one patients recieved multiple opioids)
 write.csv(finaltable,file = "finaltable.csv")
 ```
 
