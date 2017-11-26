@@ -11,10 +11,7 @@ cohort <- read_csv("~/SSmimic/Cohort/cohort.csv")
 
 #merger the tables to ease analysis
 
-table<- merge(cohort,opioid, "hadm_id", all.x = TRUE)
-table$subject_id<- table$hadm_id.x
-table$hadm_id.y<- NULL
-table$hadm_id.c<- NULL
+table<- left_join(cohort,opioid, "hadm_id")
 
 #the table now has more that 120k observations -  patients without reported pain scores are being added to the table, therefore will remove ll rows where median or max reported pain is 0
 
