@@ -29,5 +29,11 @@ oralopioid_nodup<-  oralopioid %>% distinct(hadm_id, .keep_all = TRUE)
 
 #write csv - will still have duplicated hadm_id, (if one patients recieved multiple opioids)
 write.csv(finaltable,file = "finaltable.csv")
+
+ifelse(is.na(finaltable$formulary_drug_cd), 0, 1) 
+
+
+a<- filter(finaltable1, finaltable1$admityear == "2002")
+
 ```
 
