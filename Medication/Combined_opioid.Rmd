@@ -28,6 +28,23 @@ opioid_nohadmid<-  opioid %>% distinct(hadm_id, .keep_all = TRUE)
 
 #create csv
 write.csv(opioid, file = "opioid.csv")
-write.csv(opioid_nohadmid, file = "opioid_nohadmid.csv")
+
+ 
+
+#create  table with only IV drug presiscriptions and remove duplicated hadm_id
+
+IVtable<- opioid[(opioid$route == "IV") |(opioid$route == "IV DRIP")|(opioid$route == "IVPCA") , ]
+IVtable_nodup<-  IVtable %>% distinct(hadm_id, .keep_all = TRUE)
+
+#create  table with NO IV drug presiscriptions and remove duplicated hadm_id
+
+oralopioid<- opioid[!((opioid$route == "IV") |(opioid$route == "IV DRIP")|(opioid$route == "IVPCA")), ]
+oralopioid_nodup<-  oralopioid %>% distinct(hadm_id, .keep_all = TRUE)
+
+#write csv - will still have duplicated hadm_id, (if one patients recieved multiple opioids)
+write.csv(IVtable_nodup,file = "IVtablend")
+write.csv(oralopioid_nodup,file = "oralopioidnd.csv")
+
+
 ```
 
