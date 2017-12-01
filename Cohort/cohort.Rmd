@@ -5,13 +5,97 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(dplyr)
+library(tidy)
 ```
 
 ```{r}
-library(readr)
+
 main_table <- read_csv("D:/Desktop/ss hst project/main.table.csv")
 years <- read_csv("D:/Desktop/ss hst project/years.csv")
 cohort<- merge(main_table,years,by="hadm_id")
 write.csv(cohort, file = "cohort.csv")
 ```
 
+```{r}
+
+Fentanyl <- read_csv("~/SSmimic/Medication/Fentanyl.csv")
+Hydromorphone <- read_csv("~/SSmimic/Medication/Hydromorphone.csv")
+Morphine <- read_csv("~/SSmimic/Medication/Morphine.csv")
+Oxycodone <- read_csv("~/SSmimic/Medication/Oxycodone.csv")
+Percocet <- read_csv("~/SSmimic/Medication/Percocet.csv")
+Hydrocodone <- read_csv("~/SSmimic/Medication/Hydrocodone.csv")
+
+
+#create tables with no duplicated hadm_id
+
+Fent<- Fentanyl %>% distinct(hadm_id, .keep_all = TRUE)
+Hydrom<- Hydromorphone %>% distinct(hadm_id, .keep_all = TRUE)
+Morph<- Morphine %>% distinct(hadm_id, .keep_all = TRUE)
+Oxycod<- Oxycodone %>% distinct(hadm_id, .keep_all = TRUE)
+Perco <- Percocet %>% distinct(hadm_id, .keep_all = TRUE)
+Hydrocod<- Hydrocodone %>% distinct(hadm_id, .keep_all = TRUE)
+
+#create combined opioid medication table
+opioid <- rbind(Fent,Hydrom, Morph, Oxycod, Perco, Hydrocod)
+opioid_nohadmid<-  opioid %>% distinct(hadm_id, .keep_all = TRUE)
+
+#create csv
+write.csv(opioid, file = "opioid.csv")
+
+#create  table with only IV drug presiscriptions and remove duplicated hadm_id
+
+IVtable<- opioid[(opioid$route == "IV") |(opioid$route == "IV DRIP")|(opioid$route == "IVPCA") , ]
+IVtable_nodup<-  IVtable %>% distinct(hadm_id, .keep_all = TRUE)
+write.csv(IVtable_nodup,file = "IVtable_nodup.csv")
+
+
+#create  table with NO IV drug presiscriptions and remove duplicated hadm_id
+
+oralopioid<- opioid[!((opioid$route == "IV") |(opioid$route == "IV DRIP")|(opioid$route == "IVPCA")), ]
+oralopioid_nodup<-  oralopioid %>% distinct(hadm_id, .keep_all = TRUE)
+write.csv(oralopioid_nodup,file = "oralopioid_nodup.csv")
+
+```
+
+```{r}
+
+IVopioid <- read_csv("~/SSmimic/Medication/IVtable_nodup.csv")
+cohort <- read_csv("~/SSmimic/Cohort/cohort.csv")
+
+#merger the tables to ease analysis
+
+finaltable<- left_join(cohort,IVopioid, "hadm_id")
+
+#Replacing NA to 0 and receiving an IV opioid to 1:
+
+finaltable$formulary_drug_cd<- ifelse(is.na(finaltable$formulary_drug_cd),0,1)
+
+#categorize race into 4 categories
+
+finaltable$ethnicity <- ifelse(grepl("BLACK",finaltable$ethnicity),"BLACK", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("WHITE",finaltable$ethnicity),"WHITE", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("HISPANIC",finaltable$ethnicity),"HISPANIC", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("ASIAN",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("UN",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("MUL",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("INDIAN",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("SOUTH",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("ISLAND",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("DECL",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("EAST",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("PORTU",finaltable$ethnicity),"HISPANIC", finaltable$ethnicity)
+
+finaltable$ethnicity[is.na(finaltable$ethnicity)]<-"OTHER"
+
+unique(finaltable$ethnicity)
+
+#filter out years 2001 and 2012 as they are incomplete years
+
+finaltable<- filter(finaltable, !finaltable$admityear == "2001" & !finaltable$admityear == "2012")
+
+#write csv final table: cohort plus IV opioids woth no duplicated hadm_id's
+write.csv(finaltable, file = "finaltable.csv")
+
+```
