@@ -64,6 +64,8 @@ unique(finaltable$insurance.y)
 
 finaltable<- filter(finaltable, !finaltable$admityear == "2001" & !finaltable$admityear == "2012")
 
+finaltable<- select(finaltable,"hadm_id", "subject_id.x", "med.pain", "insurance.y", "marital_status.y", "age", "gender", "ethnicity", "max_pain", "mean.pain", "oasis", "e_score", "admityear", "drug", "drug_name_generic", "formulary_drug_cd")
+
 #write csv final table: cohort plus IV opioids woth no duplicated hadm_id's
 write.csv(finaltable, file = "finaltable.csv")
 
