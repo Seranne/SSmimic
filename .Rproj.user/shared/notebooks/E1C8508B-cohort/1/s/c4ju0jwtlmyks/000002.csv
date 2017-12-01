@@ -1,0 +1,350 @@
+"0","Fentanyl <- read_csv(""~/SSmimic/Medication/Fentanyl.csv"")"
+"2","Missing column names filled in: 'X1' [1]"
+"2","Parsed with column specification:
+cols(
+  X1 = col_integer(),
+  subject_id = col_integer(),
+  hadm_id = col_integer(),
+  startdate = col_date(format = """"),
+  enddate = col_date(format = """"),
+  drug = col_character(),
+  drug_name_generic = col_character(),
+  formulary_drug_cd = col_character(),
+  form_unit_disp = col_character(),
+  route = col_character()
+)
+"
+"0","Hydromorphone <- read_csv(""~/SSmimic/Medication/Hydromorphone.csv"")"
+"2","Missing column names filled in: 'X1' [1]"
+"2","Parsed with column specification:
+cols(
+  X1 = col_integer(),
+  subject_id = col_integer(),
+  hadm_id = col_integer(),
+  startdate = col_date(format = """"),
+  enddate = col_date(format = """"),
+  drug = col_character(),
+  formulary_drug_cd = col_character(),
+  drug_name_generic = col_character(),
+  form_unit_disp = col_character(),
+  route = col_character()
+)
+"
+"1",""
+"1","|"
+"1","================="
+"1","                                                                        "
+"1","|"
+"1","  19%"
+"1",""
+"1","|"
+"1","================="
+"1","                                                                "
+"1","|"
+"1","  21%    1 MB"
+"1",""
+"1","|"
+"1","=================="
+"1","                                                               "
+"1","|"
+"1","  22%    1 MB"
+"1",""
+"1","|"
+"1","===================="
+"1","                                                             "
+"1","|"
+"1","  24%    1 MB"
+"1",""
+"1","|"
+"1","======================"
+"1","                                                           "
+"1","|"
+"1","  26%    1 MB"
+"1",""
+"1","|"
+"1","======================="
+"1","                                                          "
+"1","|"
+"1","  28%    1 MB"
+"1",""
+"1","|"
+"1","========================="
+"1","                                                        "
+"1","|"
+"1","  30%    1 MB"
+"1",""
+"1","|"
+"1","=========================="
+"1","                                                       "
+"1","|"
+"1","  32%    1 MB"
+"1",""
+"1","|"
+"1","============================"
+"1","                                                     "
+"1","|"
+"1","  34%    1 MB"
+"1",""
+"1","|"
+"1","=============================="
+"1","                                                   "
+"1","|"
+"1","  36%    1 MB"
+"1",""
+"1","|"
+"1","==============================="
+"1","                                                  "
+"1","|"
+"1","  38%    1 MB"
+"1",""
+"1","|"
+"1","================================="
+"1","                                                "
+"1","|"
+"1","  40%    2 MB"
+"1",""
+"1","|"
+"1","==================================="
+"1","                                              "
+"1","|"
+"1","  43%    2 MB"
+"1",""
+"1","|"
+"1","====================================="
+"1","                                            "
+"1","|"
+"1","  45%    2 MB"
+"1",""
+"1","|"
+"1","======================================="
+"1","                                          "
+"1","|"
+"1","  47%    2 MB"
+"1",""
+"1","|"
+"1","========================================"
+"1","                                         "
+"1","|"
+"1","  49%    2 MB"
+"1",""
+"1","|"
+"1","=========================================="
+"1","                                       "
+"1","|"
+"1","  52%    2 MB"
+"1",""
+"1","|"
+"1","============================================"
+"1","                                     "
+"1","|"
+"1","  54%    2 MB"
+"1",""
+"1","|"
+"1","=============================================="
+"1","                                   "
+"1","|"
+"1","  56%    2 MB"
+"1",""
+"1","|"
+"1","================================================"
+"1","                                 "
+"1","|"
+"1","  58%    2 MB"
+"1",""
+"1","|"
+"1","=================================================="
+"1","                               "
+"1","|"
+"1","  61%    3 MB"
+"1",""
+"1","|"
+"1","===================================================="
+"1","                             "
+"1","|"
+"1","  63%    3 MB"
+"1",""
+"1","|"
+"1","====================================================="
+"1","                            "
+"1","|"
+"1","  65%    3 MB"
+"1",""
+"1","|"
+"1","======================================================="
+"1","                          "
+"1","|"
+"1","  68%    3 MB"
+"1",""
+"1","|"
+"1","========================================================="
+"1","                        "
+"1","|"
+"1","  70%    3 MB"
+"1",""
+"1","|"
+"1","==========================================================="
+"1","                      "
+"1","|"
+"1","  72%    3 MB"
+"1",""
+"1","|"
+"1","============================================================="
+"1","                    "
+"1","|"
+"1","  74%    3 MB"
+"1",""
+"1","|"
+"1","==============================================================="
+"1","                  "
+"1","|"
+"1","  77%    3 MB"
+"1",""
+"1","|"
+"1","================================================================="
+"1","                "
+"1","|"
+"1","  79%    3 MB"
+"1",""
+"1","|"
+"1","==================================================================="
+"1","              "
+"1","|"
+"1","  81%    4 MB"
+"1",""
+"1","|"
+"1","===================================================================="
+"1","             "
+"1","|"
+"1","  84%    4 MB"
+"1",""
+"1","|"
+"1","======================================================================"
+"1","           "
+"1","|"
+"1","  86%    4 MB"
+"1",""
+"1","|"
+"1","========================================================================"
+"1","         "
+"1","|"
+"1","  88%    4 MB"
+"1",""
+"1","|"
+"1","=========================================================================="
+"1","       "
+"1","|"
+"1","  90%    4 MB"
+"1",""
+"1","|"
+"1","============================================================================"
+"1","     "
+"1","|"
+"1","  93%    4 MB"
+"1",""
+"1","|"
+"1","=============================================================================="
+"1","   "
+"1","|"
+"1","  95%    4 MB"
+"1",""
+"1","|"
+"1","================================================================================"
+"1"," "
+"1","|"
+"1","  97%    4 MB"
+"1",""
+"1","|"
+"1","================================================================================="
+"1","|"
+"1","  99%    4 MB"
+"1",""
+"1","|"
+"1","=================================================================================="
+"1","|"
+"1"," 100%    4 MB"
+"1","
+"
+"0","Morphine <- read_csv(""~/SSmimic/Medication/Morphine.csv"")"
+"2","Missing column names filled in: 'X1' [1]"
+"2","Parsed with column specification:
+cols(
+  X1 = col_integer(),
+  subject_id = col_integer(),
+  hadm_id = col_integer(),
+  startdate = col_date(format = """"),
+  enddate = col_date(format = """"),
+  drug = col_character(),
+  formulary_drug_cd = col_character(),
+  drug_name_generic = col_character(),
+  form_unit_disp = col_character(),
+  route = col_character()
+)
+"
+"0","Oxycodone <- read_csv(""~/SSmimic/Medication/Oxycodone.csv"")"
+"2","Missing column names filled in: 'X1' [1]"
+"2","Parsed with column specification:
+cols(
+  X1 = col_integer(),
+  subject_id = col_integer(),
+  hadm_id = col_integer(),
+  startdate = col_date(format = """"),
+  enddate = col_date(format = """"),
+  drug = col_character(),
+  formulary_drug_cd = col_character(),
+  drug_name_generic = col_character(),
+  form_unit_disp = col_character(),
+  route = col_character()
+)
+"
+"0","Percocet <- read_csv(""~/SSmimic/Medication/Percocet.csv"")"
+"2","Missing column names filled in: 'X1' [1]"
+"2","Parsed with column specification:
+cols(
+  X1 = col_integer(),
+  subject_id = col_integer(),
+  hadm_id = col_integer(),
+  startdate = col_date(format = """"),
+  enddate = col_date(format = """"),
+  drug = col_character(),
+  formulary_drug_cd = col_character(),
+  drug_name_generic = col_character(),
+  form_unit_disp = col_character(),
+  route = col_character()
+)
+"
+"0","Hydrocodone <- read_csv(""~/SSmimic/Medication/Hydrocodone.csv"")"
+"2","Missing column names filled in: 'X1' [1]"
+"2","Parsed with column specification:
+cols(
+  X1 = col_integer(),
+  subject_id = col_integer(),
+  hadm_id = col_integer(),
+  startdate = col_date(format = """"),
+  enddate = col_date(format = """"),
+  drug = col_character(),
+  formulary_drug_cd = col_character(),
+  drug_name_generic = col_character(),
+  form_unit_disp = col_character(),
+  route = col_character()
+)
+"
+"0","#create tables with no duplicated hadm_id"
+"0","Fent<- Fentanyl %>% distinct(hadm_id, .keep_all = TRUE)"
+"0","Hydrom<- Hydromorphone %>% distinct(hadm_id, .keep_all = TRUE)"
+"0","Morph<- Morphine %>% distinct(hadm_id, .keep_all = TRUE)"
+"0","Oxycod<- Oxycodone %>% distinct(hadm_id, .keep_all = TRUE)"
+"0","Perco <- Percocet %>% distinct(hadm_id, .keep_all = TRUE)"
+"0","Hydrocod<- Hydrocodone %>% distinct(hadm_id, .keep_all = TRUE)"
+"0","#create combined opioid medication table"
+"0","opioid <- rbind(Fent,Hydrom, Morph, Oxycod, Perco, Hydrocod)"
+"0","opioid_nohadmid<-  opioid %>% distinct(hadm_id, .keep_all = TRUE)"
+"0","#create csv"
+"0","write.csv(opioid, file = ""opioid.csv"")"
+"0","#create  table with only IV drug presiscriptions and remove duplicated hadm_id"
+"0","IVtable<- opioid[(opioid$route == ""IV"") |(opioid$route == ""IV DRIP"")|(opioid$route == ""IVPCA"") , ]"
+"0","IVtable_nodup<-  IVtable %>% distinct(hadm_id, .keep_all = TRUE)"
+"0","write.csv(IVtable_nodup,file = ""IVtable_nodup.csv"")"
+"0","#create  table with NO IV drug presiscriptions and remove duplicated hadm_id"
+"0","oralopioid<- opioid[!((opioid$route == ""IV"") |(opioid$route == ""IV DRIP"")|(opioid$route == ""IVPCA"")), ]"
+"0","oralopioid_nodup<-  oralopioid %>% distinct(hadm_id, .keep_all = TRUE)"
+"0","write.csv(oralopioid_nodup,file = ""oralopioid_nodup.csv"")"

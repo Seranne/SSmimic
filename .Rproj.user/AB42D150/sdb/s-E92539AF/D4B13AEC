@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1511730157833.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "D4B13AEC",
+    "lastKnownWriteTime" : 14636917835235410,
+    "last_content_update" : 1511730157833,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "169F9265",
+        "caption" : "IVtable_nodup",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=IVtable_nodup&cache_key=169F9265",
+        "displayedObservations" : "25406",
+        "environment" : "",
+        "object" : "IVtable_nodup",
+        "preview" : "0",
+        "totalObservations" : "25406",
+        "variables" : "30"
+    },
+    "relative_order" : 8,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

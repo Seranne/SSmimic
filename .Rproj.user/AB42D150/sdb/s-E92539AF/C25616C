@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "---\ntitle: \"Combining medication\"\noutput: html_document\n---\n\n```{r}\nlibrary(readr)\nFentanyl <- read_csv(\"~/SSmimic/Medication/Fentanyl.csv\")\nHydromorphone <- read_csv(\"~/SSmimic/Medication/Hydromorphone.csv\")\nMorphine <- read_csv(\"~/SSmimic/Medication/Morphine.csv\")\nOxycodone <- read_csv(\"~/SSmimic/Medication/Oxycodone.csv\")\nPercocet <- read_csv(\"~/SSmimic/Medication/Percocet.csv\")\nHydrocodone <- read_csv(\"~/SSmimic/Medication/Hydrocodone.csv\")\n\n\n#create tables with no duplicated hadm_id\nlibrary(dplyr)\nFent<- Fentanyl %>% distinct(hadm_id, .keep_all = TRUE)\nHydrom<- Hydromorphone %>% distinct(hadm_id, .keep_all = TRUE)\nMorph<- Morphine %>% distinct(hadm_id, .keep_all = TRUE)\nOxycod<- Oxycodone %>% distinct(hadm_id, .keep_all = TRUE)\nPerco <- Percocet %>% distinct(hadm_id, .keep_all = TRUE)\nHydrocod<- Hydrocodone %>% distinct(hadm_id, .keep_all = TRUE)\n\n#create combined opioid medication table\nopioid <- rbind(Fent,Hydrom, Morph, Oxycod, Perco, Hydrocod)\nopioid_nohadmid<-  opioid %>% distinct(hadm_id, .keep_all = TRUE)\n\n#create csv\nwrite.csv(opioid, file = \"opioid.csv\")\n\n#create  table with only IV drug presiscriptions and remove duplicated hadm_id\n\nIVtable<- opioid[(opioid$route == \"IV\") |(opioid$route == \"IV DRIP\")|(opioid$route == \"IVPCA\") , ]\nIVtable_nodup<-  IVtable %>% distinct(hadm_id, .keep_all = TRUE)\nwrite.csv(IVtable_nodup,file = \"IVtable_nodup.csv\")\n\n\n#create  table with NO IV drug presiscriptions and remove duplicated hadm_id\n\noralopioid<- opioid[!((opioid$route == \"IV\") |(opioid$route == \"IV DRIP\")|(opioid$route == \"IVPCA\")), ]\noralopioid_nodup<-  oralopioid %>% distinct(hadm_id, .keep_all = TRUE)\nwrite.csv(oralopioid_nodup,file = \"oralopioid_nodup.csv\")\n\n```\n\n",
+    "created" : 1511811512651.000,
+    "dirty" : true,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "357092581",
+    "id" : "C25616C",
+    "lastKnownWriteTime" : 1512051704,
+    "last_content_update" : 1512144114495,
+    "path" : "~/SSmimic/Medication/Combined_opioid.Rmd",
+    "project_path" : "Medication/Combined_opioid.Rmd",
+    "properties" : {
+    },
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}
