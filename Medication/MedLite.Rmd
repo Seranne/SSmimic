@@ -44,6 +44,11 @@ percocet <- dbGetQuery(con, "select * from Percocet")
 hydromorphone <- dbGetQuery(con, "select * from Hydromorphone")
 ```
 
+```{r}
+msi <- dbGetQuery(con, "select * from msinsurance")
+write.csv(msi, file = "msi.csv")
+View(msi)
+```
 
 
 CREATE OR REPLACE VIEW drugexclude as

@@ -5,9 +5,18 @@ output: html_document
 
 
 ```{r}
+#Merging insurance and marital status with main table
+library(readr)
+main_table <- read_csv("F://SSmimic/Cohort/main.table.csv")
+View(main_table)
+msi <- read_csv("F://SSmimic/Medication/msi.csv")
+View(main_table)
+main_table <- merge(main_table, msi, by ="hadm_id")
+View(main_table)
+
+
 #Merging years with main.table
 
-library(readr)
 main_table <- read_csv("D:/Desktop/ss hst project/main.table.csv")
 years <- read_csv("D:/Desktop/ss hst project/years.csv")
 cohort<- merge(main_table,years,by="hadm_id")

@@ -1,0 +1,23 @@
+---
+title: "Final Code_HST 953"
+author: "Seranne Motilal and Shravanthi Seshasayee"
+date: "1 December 2017"
+output: html_document
+---
+
+# Subsetting Mimic for Final Cohort. 
+
+Demographic Characteristics: 
+- subject_id, hadm_id, icustay_id, age, gender, ethnicity, marital status, insurance status, admit year , 
+Clinical Characteristics: 
+- mean pain, median pain, max pain, icu_los, oasis, e_score, 
+Medication Characteristics: 
+- drug, drug_name_generic, formulary_drug_cd, form_unit_disp, route
+Inclusion Criteria
+- All patients with self-reported pain scores
+To Exclude: 
+- All patients with ICD - 9 codes for Drug Dependence or Abuse [codes beginning with 304 or 305]
+- All patients with Elixhauser scores > _____
+- Years 2001 and 2012
+
+
