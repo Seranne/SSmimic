@@ -91,7 +91,7 @@ finaltable$ethnicity[is.na(finaltable$ethnicity)]<-"OTHER"
 
 unique(finaltable$ethnicity)
 
-#filter out years 2001 and 2012 as they are incomplete years
+#filter out years 2001 and 2012 as they are incomplete years and select for relevant columns
 
 finaltable<- filter(finaltable, !finaltable$admityear == "2001" & !finaltable$admityear == "2012")
 finaltable<- select(finaltable,"subject_id.x", "hadm_id", "med.pain", "age", "gender", "ethnicity","max_pain", "mean.pain", "oasis", "e_score", "admityear", "drug", "formulary_drug_cd", "drug_name_generic")
