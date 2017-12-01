@@ -66,6 +66,9 @@ finaltable<- filter(finaltable, !finaltable$admityear == "2001" & !finaltable$ad
 
 finaltable<- select(finaltable,"hadm_id", "subject_id.x", "med.pain", "insurance.y", "marital_status.y", "age", "gender", "ethnicity", "max_pain", "mean.pain", "oasis", "e_score", "admityear", "drug", "drug_name_generic", "formulary_drug_cd")
 
+#exclude patients with an Elixhauser score that is 10 or more
+finaltable<- filter(finaltable, finaltable$e_score < 10)
+
 #write csv final table: cohort plus IV opioids woth no duplicated hadm_id's
 write.csv(finaltable, file = "finaltable.csv")
 

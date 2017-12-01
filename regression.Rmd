@@ -9,6 +9,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(readr)
 library(tidyverse)
+library(ggplot2)
+library(dplyr)
 finaltable <- read_csv("~/SSmimic/finaltable.csv")
 head((finaltable))
 ```
@@ -28,17 +30,33 @@ summary(firstlook)
 
 ```{r}
 finaltable0205<- filter(finaltable, finaltable$admityear == "2002" |finaltable$admityear == "2003" |finaltable$admityear == "2004" |finaltable$admityear == "2005" )
+year2002_2005 <- ggplot(finaltable0205, aes(ethnicity, fill = formulary_drug_cd == "1")) + 
+                 geom_bar(position = "fill") + 
+                 labs(x = "Ethnicity", fill = "Received IV Opioids")
+year2002_2005
+
 years1 <- glm(finaltable0205$formulary_drug_cd ~ finaltable0205$ethnicity + finaltable0205$med.pain, family = binomial(link = "logit"))
 summary(years1)
 ```
 
 ```{r}
 finaltable0608<- filter(finaltable, finaltable$admityear == "2006" |finaltable$admityear == "2007" |finaltable$admityear == "2008")
+
+year2006_2008 <- ggplot(finaltable0608, aes(ethnicity, fill = formulary_drug_cd == "1")) + 
+                 geom_bar(position = "fill") + 
+                 labs(x = "Ethnicity", fill = "Received IV Opioids") 
+
+year2006_2008
 years2 <- glm(finaltable0608$formulary_drug_cd ~ finaltable0608$ethnicity + finaltable0608$med.pain, family = binomial(link = "logit"))
 summary(years2)
 ```
 ```{r}
 finaltable0911<- filter(finaltable, finaltable$admityear == "2009" |finaltable$admityear == "2010" |finaltable$admityear == "2011")
+year2009_2011 <- ggplot(finaltable0911, aes(ethnicity, fill = formulary_drug_cd == "1")) + 
+                 geom_bar(position = "fill") + 
+                 labs(x = "Ethnicity", fill = "Received IV Opioids") 
+year2009_2011
+
 years3 <- glm(finaltable0911$formulary_drug_cd ~ finaltable0911$ethnicity + finaltable0911$med.pain, family = binomial(link = "logit"))
 summary(years3)
 ```
