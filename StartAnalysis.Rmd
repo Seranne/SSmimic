@@ -6,6 +6,7 @@ output: html_document
 ```{r}
 library(tidyverse)
 library(readr)
+
 IVopioid <- read_csv("~/SSmimic/Medication/IVtable_nodup.csv")
 cohort <- read_csv("~/SSmimic/Cohort/cohort.csv")
 
@@ -17,9 +18,33 @@ finaltable<- left_join(cohort,IVopioid, "hadm_id")
 
 finaltable$formulary_drug_cd<- ifelse(is.na(finaltable$formulary_drug_cd),0,1)
 
+
+
+finaltable$ethnicity <- ifelse(grepl("BLACK",finaltable$ethnicity),"BLACK", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("WHITE",finaltable$ethnicity),"WHITE", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("HISPANIC",finaltable$ethnicity),"HISPANIC", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("ASIAN",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("UN",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("MUL",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("INDIAN",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("SOUTH",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("ISLAND",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("DECL",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("EAST",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("PORTU",finaltable$ethnicity),"HISPANIC", finaltable$ethnicity)
+
+finaltable$ethnicity[is.na(finaltable$ethnicity)]<-"OTHER"
+
 #write csv final table: cohort plus IV opioids woth no duplicated hadm_id's
 write.csv(finaltable, file = "finaltable.csv")
 
+unique(finaltable$ethnicity)
+
+
+
+
+
 
 ```
+
 
