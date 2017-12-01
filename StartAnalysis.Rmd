@@ -18,7 +18,7 @@ finaltable<- left_join(cohort,IVopioid, "hadm_id")
 
 finaltable$formulary_drug_cd<- ifelse(is.na(finaltable$formulary_drug_cd),0,1)
 
-
+#categorize race into 4 categories
 
 finaltable$ethnicity <- ifelse(grepl("BLACK",finaltable$ethnicity),"BLACK", finaltable$ethnicity)
 finaltable$ethnicity <- ifelse(grepl("WHITE",finaltable$ethnicity),"WHITE", finaltable$ethnicity)
@@ -35,15 +35,14 @@ finaltable$ethnicity <- ifelse(grepl("PORTU",finaltable$ethnicity),"HISPANIC", f
 
 finaltable$ethnicity[is.na(finaltable$ethnicity)]<-"OTHER"
 
-#write csv final table: cohort plus IV opioids woth no duplicated hadm_id's
-write.csv(finaltable, file = "finaltable.csv")
-
 unique(finaltable$ethnicity)
 
+#filter out years 2001 and 2012 as they are incomplete years
 
+finaltable<- filter(finaltable, !finaltable$admityear == "2001" & !finaltable$admityear == "2012")
 
-
-
+#write csv final table: cohort plus IV opioids woth no duplicated hadm_id's
+write.csv(finaltable, file = "finaltable.csv")
 
 ```
 
