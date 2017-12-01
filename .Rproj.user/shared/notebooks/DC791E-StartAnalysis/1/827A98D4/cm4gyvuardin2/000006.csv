@@ -1,5 +1,0 @@
-"0","drugexclude <- dbGetQuery(con, ""select * from drugexclude"") 
-"
-"2","Error in dbGetQuery(con, ""select * from drugexclude"") : 
-  object 'con' not found
-"
