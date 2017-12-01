@@ -1,8 +1,9 @@
 ---
-title: "Untitled"
+title: "Cohort"
 output: html_document
 ---
 
+<<<<<<< HEAD
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(readr)
@@ -10,9 +11,21 @@ library(dplyr)
 library(tidyverse)
 ```
 
-```{r}
 
-main_table <- read_csv("D:/Desktop/ss hst project/main.table.csv")
+
+
+```{r}
+#Merging insurance and marital status with main table
+library(readr)
+main_table <- read_csv("~/SSmimic/Cohort/main.table.csv")
+msi <- read_csv("~/SSmimic/Medication/msi.csv")
+main_table <- merge(main_table, msi, by ="hadm_id")
+head(main_table)
+```
+
+```{r}
+#Merging years with main.table
+#>>>>>>> d9d4abefe32dcd4d82d6c5a33251ba031172e8c9
 years <- read_csv("D:/Desktop/ss hst project/years.csv")
 cohort<- merge(main_table,years,by="hadm_id")
 write.csv(cohort, file = "cohort.csv")
@@ -94,7 +107,7 @@ unique(finaltable$ethnicity)
 #filter out years 2001 and 2012 as they are incomplete years and select for relevant columns
 
 finaltable<- filter(finaltable, !finaltable$admityear == "2001" & !finaltable$admityear == "2012")
-finaltable<- select(finaltable,"subject_id.x", "hadm_id", "med.pain", "age", "gender", "ethnicity","max_pain", "mean.pain", "oasis", "e_score", "admityear", "drug", "formulary_drug_cd", "drug_name_generic")
+finaltable<- select(finaltable,"subject_id.x", "hadm_id", "med.pain", "age", "gender", "ethnicity","max_pain", "mean.pain", "oasis", "e_score", "admityear", "drug", "formulary_drug_cd", "drug_name_generic", "marital_status.y","insurance.y")
 
 #write csv final table: cohort plus IV opioids woth no duplicated hadm_id's
 write.csv(finaltable, file = "finaltable.csv")
