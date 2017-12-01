@@ -6,34 +6,44 @@ output: html_document
 ```{r}
 library(tidyverse)
 library(readr)
-opioid <- read_csv("~/SSmimic/Medication/opioid.csv")
+
+IVopioid <- read_csv("~/SSmimic/Medication/IVtable_nodup.csv")
 cohort <- read_csv("~/SSmimic/Cohort/cohort.csv")
 
 #merger the tables to ease analysis
 
-finaltable<- left_join(cohort,opioid, "hadm_id")
+finaltable<- left_join(cohort,IVopioid, "hadm_id")
 
-#the table now has more that 120k observations -  patients without reported pain scores are being added to the table, therefore will remove ll rows where median or max reported pain is 0
+#Replacing NA to 0 and receiving an IV opioid to 1:
 
-sum(is.na(finaltable$formulary_drug_cd))
+finaltable$formulary_drug_cd<- ifelse(is.na(finaltable$formulary_drug_cd),0,1)
 
-#create  table with only IV drug presiscriptions and remove duplicated hadm_id
+#categorize race into 4 categories
 
-IVtable<- finaltable[(finaltable$route == "IV") |(finaltable$route == "IV DRIP")|(finaltable$route == "IVPCA") , ]
-IVtable_nodup<-  IVtable %>% distinct(hadm_id, .keep_all = TRUE)
+finaltable$ethnicity <- ifelse(grepl("BLACK",finaltable$ethnicity),"BLACK", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("WHITE",finaltable$ethnicity),"WHITE", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("HISPANIC",finaltable$ethnicity),"HISPANIC", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("ASIAN",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("UN",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("MUL",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("INDIAN",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("SOUTH",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("ISLAND",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("DECL",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("EAST",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("PORTU",finaltable$ethnicity),"HISPANIC", finaltable$ethnicity)
 
-#create  table with NO IV drug presiscriptions and remove duplicated hadm_id
+finaltable$ethnicity[is.na(finaltable$ethnicity)]<-"OTHER"
 
-oralopioid<- finaltable[!((finaltable$route == "IV") |(finaltable$route == "IV DRIP")|(finaltable$route == "IVPCA")), ]
-oralopioid_nodup<-  oralopioid %>% distinct(hadm_id, .keep_all = TRUE)
+unique(finaltable$ethnicity)
 
-#write csv - will still have duplicated hadm_id, (if one patients recieved multiple opioids)
-write.csv(finaltable,file = "finaltable.csv")
+#filter out years 2001 and 2012 as they are incomplete years
 
-ifelse(is.na(finaltable$formulary_drug_cd), 0, 1) 
+finaltable<- filter(finaltable, !finaltable$admityear == "2001" & !finaltable$admityear == "2012")
 
-
-a<- filter(finaltable1, finaltable1$admityear == "2002")
+#write csv final table: cohort plus IV opioids woth no duplicated hadm_id's
+write.csv(finaltable, file = "finaltable.csv")
 
 ```
+
 
