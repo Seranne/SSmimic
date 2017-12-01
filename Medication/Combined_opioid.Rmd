@@ -42,10 +42,5 @@ oralopioid<- opioid[!((opioid$route == "IV") |(opioid$route == "IV DRIP")|(opioi
 oralopioid_nodup<-  oralopioid %>% distinct(hadm_id, .keep_all = TRUE)
 write.csv(oralopioid_nodup,file = "oralopioid_nodup.csv")
 
-
-
-
-
-
 ```
 
