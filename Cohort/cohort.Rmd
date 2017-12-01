@@ -1,13 +1,12 @@
 ---
-title: "Untitled"
+title: "Cohort"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
 
 ```{r}
+#Merging years with main.table
+
 library(readr)
 main_table <- read_csv("D:/Desktop/ss hst project/main.table.csv")
 years <- read_csv("D:/Desktop/ss hst project/years.csv")

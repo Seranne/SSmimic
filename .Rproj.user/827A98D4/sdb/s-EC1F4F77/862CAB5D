@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "# SSmimic\n\nMIMIC Database:\n\n1. Subsetting the MIMIC database:\n\nDemographic Characteristics: \n- subject_id, hadm_id, icustay_id, age, gender, ethnicity, marital status, insurance status, admit year , \n\nClinical Characteristics: \n- mean pain, median pain, max pain, icu_los, oasis, e_score, \n\nMedication Characteristics: \n- drug, drug_name_generic, formulary_drug_cd, form_unit_disp, route\n\n\nTo include: \n- All patients with self-reported pain scores\n\nTo Exclude: \n- All patients with ICD - 9 codes for Drug Dependence or Abuse [codes beginning with 304 or 305]\n- All patients with Elixhauser scores > _____\n- Years 2001 and 2012\n\n2. Identifying Patients who received IV Opioids:\n\n- Patients who received ____\n- All patients who received IV medication \n\n\n3. Analysis:\n- Ethnicity categorized as Black, White, Hispanic and Other \n- Marital Status categorized as ____\n- Insurance Status categorized as ____\n- Patients who received Opioids coded as 1, and who did not were coded as 0\n- Years categorized as 2002 - 2005; 2006 - 2008; 2009 - 2011\n\n\n\n\n\n",
+    "created" : 1512143586580.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2137656804",
+    "id" : "862CAB5D",
+    "lastKnownWriteTime" : 1512145194,
+    "last_content_update" : 1512145195510,
+    "path" : "F://SSmimic/README.md",
+    "project_path" : "README.md",
+    "properties" : {
+    },
+    "relative_order" : 10,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "markdown"
+}

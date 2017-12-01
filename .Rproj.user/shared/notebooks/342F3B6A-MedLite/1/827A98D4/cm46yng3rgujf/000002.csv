@@ -1,0 +1,2 @@
+"0","fentanyl <- dbGetQuery(con, ""select * from Fentanyl"")"
+"0","#colnames(icu_stay_table) <- c(""subject_id"", ""hadm_id"", ""icustay_id"", ""intime"", ""icu_los"")"

@@ -1,0 +1,9 @@
+{
+    "path" : "F://SSmimic/Medication",
+    "sortOrder" : [
+        {
+            "ascending" : true,
+            "columnIndex" : 2
+        }
+    ]
+}

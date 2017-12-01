@@ -44,6 +44,29 @@ percocet <- dbGetQuery(con, "select * from Percocet")
 hydromorphone <- dbGetQuery(con, "select * from Hydromorphone")
 ```
 
+
+
+CREATE OR REPLACE VIEW drugexclude as
+select hadm_id from diagnoses_icd
+where icd9_code not like '304%' or icd9_code like '305%'
+
+```{r}
+#excluding patience with diagnoses of drug dependence and abuse (ICD - 9 codes beginning with 304 and 305)
+main_table <- read_csv("F://SSmimic/Cohort/main.table.csv")
+View(main_table)
+
+drugexclude <- dbGetQuery(con, "select * from drugexclude")
+write.csv(drugexclude, file = "drugexclude.csv")
+View(drugexclude)
+
+result <- main_table %>% filter(hadm_id %in% drugexclude$hadm_id)
+View(result)
+```
+
+
+
+
+
 ```{r}
 write.csv(fentanyl, file = "Fentanyl.csv")
 write.csv(morphine, file = "Morphine.csv")

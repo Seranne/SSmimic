@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "---\ntitle: \"MedFentanyl\"\nauthor: \"Shravanthi Seshasayee\"\ndate: \"22 November 2017\"\noutput: html_document\n---\n\n```{r setup, include=FALSE}\nknitr::opts_chunk$set(echo = TRUE)\nlibrary(ggplot2)\nlibrary(mgcv)\nlibrary(dplyr)\n# install.packages(\"RPostgreSQL\") ##Install package if needed\nrequire(\"RPostgreSQL\")\nlibrary(stringr)\n```\n\n## Background\nThe following markdown is designed to search through the mimic database and find all patients who underwent CABG procedure. These patients will be found using CPT codes. The corresponding patients and there associated pain levels will also be searched for. We will use the MIMIC database to find additional factors such as medications used to sedate the pateint, surgical complications. Our goal is to see if these pain levels are potentially associated with worse patient outcomes. The outcomes of interest are hospital length of stay, 30 day mortality rate, and 1 year mortality rate. \n\n## Analysis Table Build\nThe first chunk of code allows R to conenct to MIMIC database \n```{r echo = F}\n# loads the PostgreSQL driver\ndrv <- dbDriver(\"PostgreSQL\") \n# creates a connection to the postgres database (MIMIC)\n# note that \"con\" will be used later in each connection to the database\ncon <- dbConnect(drv, dbname = \"mimic\",\n                 host = \"localhost\", port = 5432,\n                 user = \"postgres\", password = \"postgres\") # password and username were specific to my \n                                          # computer, removed here\n\ndbGetQuery(con, \"set search_path to mimiciii\")\n```\n```{r}\nfentanyl <- dbGetQuery(con, \"select * from Fentanyl\")\n#colnames(icu_stay_table) <- c(\"subject_id\", \"hadm_id\", \"icustay_id\", \"intime\", \"icu_los\")\n```\n\n```{r}\nmorphine <- dbGetQuery(con, \"select * from Morphine\")\noxycodone <- dbGetQuery(con, \"select * from Oxycodone\")\npercocet <- dbGetQuery(con, \"select * from Percocet\")\nhydromorphone <- dbGetQuery(con, \"select * from Hydromorphone\")\n```\n\n\n\nCREATE OR REPLACE VIEW drugexclude as\nselect hadm_id from diagnoses_icd\nwhere icd9_code not like '304%' or icd9_code like '305%'\n\n```{r}\n#excluding patience with diagnoses of drug dependence and abuse (ICD - 9 codes beginning with 304 and 305)\nmain_table <- read_csv(\"F://SSmimic/Cohort/main.table.csv\")\nView(main_table)\n\ndrugexclude <- dbGetQuery(con, \"select * from drugexclude\")\nwrite.csv(drugexclude, file = \"drugexclude.csv\")\nView(drugexclude)\n\nresult <- main_table %>% filter(hadm_id %in% drugexclude$hadm_id)\nView(result)\n```\n\n\n\n\n\n```{r}\nwrite.csv(fentanyl, file = \"Fentanyl.csv\")\nwrite.csv(morphine, file = \"Morphine.csv\")\nwrite.csv(oxycodone, file = \"Oxycodone.csv\")\nwrite.csv(percocet, file = \"Percocet.csv\")\nwrite.csv(percocet, file = \"Hydromorphone.csv\")\n```\n\n",
+    "created" : 1511623309829.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3363671268",
+    "id" : "5FE02E45",
+    "lastKnownWriteTime" : 1512145366,
+    "last_content_update" : 1512145366415,
+    "path" : "F://SSmimic/Medication/MedLite.Rmd",
+    "project_path" : "Medication/MedLite.Rmd",
+    "properties" : {
+        "last_setup_crc32" : "989FDE9ed44fa75"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

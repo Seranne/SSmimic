@@ -1,0 +1,32 @@
+"0","#excluding patience with diagnoses of drug dependence and abuse (ICD - 9 codes beginning with 304 and 305)"
+"0","main_table <- read_csv(""F://SSmimic/Cohort/main.table.csv"")"
+"2","Missing column names filled in: 'X1' [1]"
+"2","Parsed with column specification:
+cols(
+  X1 = col_integer(),
+  hadm_id = col_integer(),
+  med.pain = col_double(),
+  subject_id = col_integer(),
+  insurance = col_character(),
+  marital_status = col_character(),
+  age = col_double(),
+  gender = col_character(),
+  ethnicity = col_character(),
+  max_pain = col_integer(),
+  icustay_id = col_integer(),
+  intime = col_date(format = """"),
+  icu_los = col_double(),
+  mean.pain = col_double(),
+  oasis = col_integer(),
+  e_score = col_integer(),
+  mean.GCS = col_double(),
+  min.GCS = col_integer(),
+  max.GCS = col_integer()
+)
+"
+"0","View(main_table)"
+"0","drugexclude <- dbGetQuery(con, ""select * from drugexclude"")"
+"0","write.csv(drugexclude, file = ""drugexclude.csv"")"
+"0","View(drugexclude)"
+"0","result <- finaltable %>% filter(hadm_id %in% drugexclude$hadm_id)"
+"0","View(result)"

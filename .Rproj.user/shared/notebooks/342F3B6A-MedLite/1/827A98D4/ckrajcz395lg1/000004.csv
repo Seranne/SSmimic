@@ -1,0 +1,6 @@
+"0","write.csv(fentanyl, file = ""Fentanyl.csv"")"
+"0","write.csv(morphine, file = ""Morphine.csv"")"
+"0","write.csv(oxycodone, file = ""Oxycodone.csv"")"
+"0","write.csv(percocet, file = ""Percocet.csv"")"
+"0","write.csv(hydromorphone, file = ""Hydromorphone.csv"")"
+"0","write.csv(hydrocodone, file = ""Hydrocodone.csv"")"

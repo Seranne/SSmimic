@@ -1,0 +1,5 @@
+"0","morphine <- dbGetQuery(con, ""select * from Morphine"")"
+"0","oxycodone <- dbGetQuery(con, ""select * from Oxycodone"")"
+"0","percocet <- dbGetQuery(con, ""select * from Percocet"")"
+"0","hydromorphone <- dbGetQuery(con, ""select * from Hydromorphone"")"
+"0","hydrocodone <- dbGetQuery(con, ""select * from Hydrocodone"")"

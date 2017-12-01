@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1512140853493.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "65AFB949",
+    "lastKnownWriteTime" : 7309949647250879074,
+    "last_content_update" : 1512140853493,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "43082A14",
+        "caption" : "D_ICD_DIAGNOSES",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=D_ICD_DIAGNOSES&cache_key=43082A14",
+        "displayedObservations" : 14567,
+        "environment" : "",
+        "object" : "D_ICD_DIAGNOSES",
+        "preview" : 0,
+        "totalObservations" : 14567,
+        "variables" : 4
+    },
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}
