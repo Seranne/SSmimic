@@ -1,0 +1,228 @@
+---
+title: "Final Code_HST 953"
+author: "Seranne Motilal and Shravanthi Seshasayee"
+date: "1 December 2017"
+output: html_document
+---
+## Background
+
+The aim of our study is to identify if there is an association between a patient's demographic characteristics (age, gender, ethnicity, marital status and insurance coverage) and our outcome of interest: prescription of IV opioid medication (yes = 1, no = 0). We also investigate if this association has shown a difference in trends over time, between the years 2002 and 2011. 
+
+The following markdown is designed to search through the mimic database and generate a table containing details of patients with self-reported pain scores between the years 2002 and 2011, their demographic and clinical characteristics, and corresponding IV opioid prescription information. 
+
+All patients with ICD-9 codes corresponding with drug dependence and abuse have been excluded.Patients with elixhauser scores greater than 10 have been excluded.
+
+# Subsetting Mimic for Final Cohort. 
+Demographic Characteristics: 
+- subject_id, hadm_id, icustay_id, age, gender, ethnicity, marital status, insurance status, admit year, 
+Clinical Characteristics: 
+- mean pain, median pain, max pain, icu_los, oasis, e_score, 
+Prescription Characteristics: 
+- drug, drug_name_generic, formulary_drug_cd, form_unit_disp, route
+Inclusion Criteria
+- All patients with self-reported pain scores
+To Exclude: 
+- All patients with ICD - 9 codes for Drug Dependence or Abuse [codes beginning with 304 or 305]
+- All patients with Elixhauser scores > 10
+
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(mgcv)
+library(dplyr)
+require("RPostgreSQL")
+library(stringr)
+library(tidyverse)
+```
+
+The first chunk of code allows R to connect to MIMIC database:
+```{r echo = F}
+# Loads the PostgreSQL driver
+drv <- dbDriver("PostgreSQL") 
+
+# Creates a connection to the postgres database (MIMIC)
+# Note that "con" will be used later in each connection to the database
+
+con <- dbConnect(drv, dbname = "mimic",
+                 host = "localhost", port = 5432,
+                 user = "postgres", password = "postgres")
+
+dbGetQuery(con, "set search_path to mimiciii")
+```
+
+The following code chunks use tables derived from the MIMIC database to create a dataframe with all the variables of interest for each patient.
+
+## Patient Details: Demographic and Admission Characteristics 
+```{r echo = T, cache = TRUE}
+# First table contains subject_id, hadm_id, icustay_id, age, gender, ethnicity, marital status, insurance status, los_hospital, los_icu. Excludes patients with ICD-9 diagnoses codes for drug dependence or abuse
+# SQL code for Materialized View "ptdetails" available from SQLCode.txt
+ptdetails <- dbGetQuery(con, "select * from patientdetails")
+
+# adding admityear: Permissions required to access Year data
+years <- read_csv("/SSmimic/years.csv")
+ptdetails <- merge(ptdetails, years, by = "hadm_id")
+
+# Filter out years 2001 and 2012 as they are incomplete years
+ptdetails <- filter(ptdetails, !ptdetails$admityear == "2001" & !ptdetails$admityear == "2012")
+
+# Sets pts >89 yo (300 yo in database) to the median of 91.4
+ptdetails$age[which(ptdetails$age > 300)] <- 91.4
+
+# Removing duplicates
+ptdetails <- ptdetails[-which(duplicated(ptdetails$hadm_id)),]
+
+# Sample size
+length(unique(ptdetails$hadm_id))
+```
+
+
+## Patient Details: Clinical Characteristics 
+# Pain scores
+```{r echo = T, cache = TRUE}
+# Search through d_items table (containing item ids from both Metavision and CareVue databases) to derive item ids reflecting self-reported pain scores recorded in MIMIC
+pain_items <- dbGetQuery(con, "select itemid, label from d_items where label like  '%pain%' or label like '%Pain%'")
+pain_items
+```
+
+Looking at the table above, these are the following item_ids that will be used to obtain pain level from the chartevents tables: 1044 (Pain Level - CareVue), 1045 (Pain Level/Response - CareVue), 225813 (Baseline pain level - Metavision), 224409 (Pain Level Response - Metavision), 227881 (Pain (0-10)), 223791 (Pain Level - Metavision).
+
+```{r echo = T, cache = TRUE}
+# Select all pain level measurements from the chartevents table and convert all measures to the same format
+pain_table <- dbGetQuery(con, "select * from mimiciii.chartevents where itemid  in (1044, 1045, 225813, 224409, 227881, 223791)")
+for(i in 1:nrow(pain_table)){
+  if(length(
+  unique(na.omit(as.numeric(unlist(strsplit(unlist(pain_table$value[i]), 
+                                            "[^0-9]+")))))) == 1){
+    pain_table$valuenum[i] <- unique(na.omit(as.numeric(unlist(strsplit(unlist(pain_table$value[i]), 
+                                                                 "[^0-9]+")))))
+  }
+  if(length(
+    unique(na.omit(as.numeric(unlist(strsplit(unlist(pain_table$value[i]), 
+                                              "[^0-9]+")))))) == 2){
+                      pain_table$valuenum[i] <- 0
+                                              }
+}
+
+```
+
+
+```{r echo = T, cache = TRUE}
+# Calculate mean, median, and max pain scores for each patient per hospital stay. Return histogram of findings.
+avg.pain <- aggregate(valuenum ~ hadm_id, data = pain_table, mean)
+colnames(avg.pain) = c("hadm_id", "mean.pain")
+qplot(x = round(mean.pain), data = avg.pain, geom = "histogram") + ggtitle("Avg Pain level Hist")
+
+max.pain <- aggregate(valuenum ~ hadm_id, data = pain_table, max)
+colnames(max.pain) = c("hadm_id", "max_pain")
+max.pain$max_pain <- as.numeric(max.pain$max_pain)
+qplot(x = max_pain, data = max.pain, geom = "histogram") + ggtitle(" Max Pain level Hist")
+
+med.pain <- aggregate(valuenum ~ hadm_id, data = pain_table, median)
+colnames(med.pain) = c("hadm_id", "med.pain")
+med.pain$med.pain <- as.numeric(med.pain$med.pain)
+
+qplot(x = med.pain, data = med.pain, geom = "histogram")
+```
+
+
+```{r echo = T, cache = TRUE}
+# Extract OASIS scores from MIMIC
+oasis <- dbGetQuery(con, "select subject_id, oasis from oasis")
+
+# Eliminate duplicates in oasis
+oasis <- oasis[-which(duplicated(oasis$subject_id)),]
+```
+
+
+```{r echo = T, cache = TRUE}
+# Extract Elixhauser scores from MIMIC 
+elix <- dbGetQuery(con, "select * from mimiciii.elixhauser_ahrq_no_drg_all_icd")
+elix$e_score <- apply(elix[,3:32], 1, sum)
+```
+
+# Merge all above variables into one main cohort table, which will be used to run analysis
+```{r echo = T, cache = TRUE}
+# Table will contain only patients for whom avg.pain scores are available
+main.table <- merge(x = ptdetails, y = avg.pain, all.x = F, all.y = T)
+main.table <- merge(x = main.table, y = max.pain, all.x = T, all.y = F)
+main.table <- merge(x = main.table, y = med.pain, all.x = T, all.y = F)
+main.table <- merge(x = main.table, y = oasis, all.x = T, all.y = F)
+main.table <- merge(x = main.table, y = elix[,c(2,33)], all.x = T, all.y = F)
+
+# Exclude patients with an Elixhauser score that is 10 or more
+main.table <- filter(main.table, main.table$e_score < 10)
+```
+
+# Generating Cohort Table
+```{r echo = F}
+write.csv(main.table, "./main.table.csv")
+
+# Save hadm_id from cohort to use in medication extraction
+write.csv(main.table$hadm_id, "./cohort_hadmi_id.csv")
+```
+
+## Medication: Opioid Medications were defined to include: 
+Fentanyl, Remifentanil, Alfentanil, Sufentanil, Morphine, Oxycodone, Percocet, Hydrocodone, Hydrocodone Bitartrate, Oxycodone Hydrochloride, Hydromorphone Hydrochloride, and Methadone. SQL Codes for extracting these prescriptions from the table Prescriptions, are available from SQLCode.txt.
+
+```{r, echo = TRUE, cache = TRUE}
+# Extract drugs from Prescriptions, and write .csv files for each:
+fentanyl <- dbGetQuery(con, "select * from Fentanyl")
+morphine <- dbGetQuery(con, "select * from Morphine")
+oxycodone <- dbGetQuery(con, "select * from Oxycodone")
+hydrocodone <- dbGetQuery(con, "select * from Hydrocodone")
+percocet <- dbGetQuery(con, "select * from Percocet")
+hydromorphone <- dbGetQuery(con, "select * from Hydromorphone")
+methadone <- dbGetQuery(con, "select * from Methadone")
+
+write.csv(fentanyl, file = "Fentanyl.csv")
+read_csv("/SSmimic/Final Code and Write Up/Fentanyl.csv")
+write.csv(morphine, file = "Morphine.csv")
+read_csv("/SSmimic/Final Code and Write Up/Morphine.csv")
+write.csv(oxycodone, file = "Oxycodone.csv")
+read_csv("/SSmimic/Final Code and Write Up/Oxycodone.csv")
+write.csv(hydrocodone, file = "Hydrocodone.csv")
+read_csv("/SSmimic/Final Code and Write Up/Hydrocodone.csv")
+write.csv(percocet, file = "Percocet.csv")
+read_csv("/SSmimic/Final Code and Write Up/Percocet.csv")
+write.csv(hydromorphone, file = "Hydromorphone.csv")
+read_csv("/SSmimic/Final Code and Write Up/Hydromorphone.csv")
+write.csv(methadone, file = "Methadone.csv")
+read_csv("/SSmimic/Final Code and Write Up/Methadone.csv")
+```
+
+```{r, echo = TRUE, cache = TRUE}
+# Create tables with no duplicated hadm_id
+Fent <- Fentanyl %>% distinct(hadm_id, .keep_all = TRUE)
+Hydrom <- Hydromorphone %>% distinct(hadm_id, .keep_all = TRUE)
+Morph <- Morphine %>% distinct(hadm_id, .keep_all = TRUE)
+Oxycod <- Oxycodone %>% distinct(hadm_id, .keep_all = TRUE)
+Perco <- Percocet %>% distinct(hadm_id, .keep_all = TRUE)
+Hydrocod <- Hydrocodone %>% distinct(hadm_id, .keep_all = TRUE)
+Methad <- Methadone %>% distinct(hadm_id, .keep_all = TRUE)
+
+# Create combined opioid medication table
+opioid <- rbind(Fent,Hydrom, Morph, Oxycod, Perco, Hydrocod, Methad)
+opioid_nohadmid <-  opioid %>% distinct(hadm_id, .keep_all = TRUE)
+
+# Create .csv file for combined opioid prescriptions
+write.csv(opioid, file = "opioid.csv")
+
+# Filter table for only IV drug prescriptions and remove duplicated hadm_ids
+IVtable <- opioid[(opioid$route == "IV") |(opioid$route == "IV DRIP")|(opioid$route == "IVPCA") , ]
+IVtable_nodup <-  IVtable %>% distinct(hadm_id, .keep_all = TRUE)
+write.csv(IVtable_nodup, file = "IVtable_nodup.csv")
+
+
+# Filter table for NO IV drug prescriptions and remove duplicated hadm_id
+oralopioid <- opioid[!((opioid$route == "IV") |(opioid$route == "IV DRIP")|(opioid$route == "IVPCA")), ]
+oralopioid_nodup <-  oralopioid %>% distinct(hadm_id, .keep_all = TRUE)
+write.csv(oralopioid_nodup, file = "oralopioid_nodup.csv")
+```
+
+# Final Merge between patient cohort details (main.table.csv) and IV Opioid prescription information to ease analysis
+
+```{r, cache = TRUE}
+finaltable <- left_join(main.table , IVtable_nodup, "hadm_id")
+View(finaltable)
+```
