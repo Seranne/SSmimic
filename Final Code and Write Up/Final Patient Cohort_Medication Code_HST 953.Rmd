@@ -157,7 +157,8 @@ main.table <- filter(main.table, main.table$e_score < 10)
 
 # Generating Cohort Table
 ```{r echo = F}
-write.csv(main.table, "./main.table.csv")
+write.csv(main.table, file = "Main Table.csv")
+main.table <- read.csv("/SSMimic/Final Code and Write Up/Main Table.csv")
 
 # Save hadm_id from cohort to use in medication extraction
 write.csv(main.table$hadm_id, "./cohort_hadmi_id.csv")
@@ -175,36 +176,28 @@ hydrocodone <- dbGetQuery(con, "select * from Hydrocodone")
 percocet <- dbGetQuery(con, "select * from Percocet")
 hydromorphone <- dbGetQuery(con, "select * from Hydromorphone")
 methadone <- dbGetQuery(con, "select * from Methadone")
+```
 
+```{r, cache = TRUE}
 write.csv(fentanyl, file = "Fentanyl.csv")
-#read_csv("~/SSmimic/Final Code and Write Up/Fentanyl.csv")
 write.csv(morphine, file = "Morphine.csv")
-#read_csv("~/SSmimic/Final Code and Write Up/Morphine.csv")
 write.csv(oxycodone, file = "Oxycodone.csv")
-#read_csv("~/SSmimic/Final Code and Write Up/Oxycodone.csv")
 write.csv(hydrocodone, file = "Hydrocodone.csv")
-#read_csv("~/SSmimic/Final Code and Write Up/Hydrocodone.csv")
 write.csv(percocet, file = "Percocet.csv")
-#read_csv("~/SSmimic/Final Code and Write Up/Percocet.csv")
 write.csv(hydromorphone, file = "Hydromorphone.csv")
-#read_csv("~/SSmimic/Final Code and Write Up/Hydromorphone.csv")
 write.csv(methadone, file = "Methadone.csv")
-#read_csv("~/SSmimic/Final Code and Write Up/Methadone.csv")
+
+Fentanyl <- read_csv("/SSmimic/Medication/Fentanyl.csv")
+Hydromorphone <- read_csv("/SSmimic/Medication/Hydromorphone.csv")
+Morphine <- read_csv("/SSmimic/Medication/Morphine.csv")
+Oxycodone <- read_csv("/SSmimic/Medication/Oxycodone.csv")
+Percocet <- read_csv("/SSmimic/Medication/Percocet.csv")
+Hydrocodone <- read_csv("/SSmimic/Medication/Hydrocodone.csv")
+Methadone <- read_csv("/SSmimic/Medication/Methadone.csv")
 ```
 
 ```{r}
-library(readr)
-Fentanyl <- read_csv("~/SSmimic/Medication/Fentanyl.csv")
-Hydromorphone <- read_csv("~/SSmimic/Medication/Hydromorphone.csv")
-Morphine <- read_csv("~/SSmimic/Medication/Morphine.csv")
-Oxycodone <- read_csv("~/SSmimic/Medication/Oxycodone.csv")
-Percocet <- read_csv("~/SSmimic/Medication/Percocet.csv")
-Hydrocodone <- read_csv("~/SSmimic/Medication/Hydrocodone.csv")
-Methadone <- read_csv("~/SSmimic/Medication/Methadone.csv")
-
-
 #create tables with no duplicated hadm_id
-library(dplyr)
 Fent<- Fentanyl %>% distinct(hadm_id, .keep_all = TRUE)
 Hydrom<- Hydromorphone %>% distinct(hadm_id, .keep_all = TRUE)
 Morph<- Morphine %>% distinct(hadm_id, .keep_all = TRUE)
