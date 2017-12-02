@@ -1,0 +1,56 @@
+-- Materialized View: ptdetails 
+CREATE MATERIALIZED VIEW ptdetails AS (
+select admissions.subject_id, admissions.hadm_id, icustay_detail.icustay_id, icustay_detail.age,
+    icustay_detail.gender, admissions.ethnicity, admissions.marital_status, admissions.insurance, 
+    icustay_detail.los_hospital, icustay_detail.los_icu, diagnoses_icd.icd9_code
+        from admissions
+inner join icustay_detail ON admissions.hadm_id = icustay_detail.hadm_id
+    inner join diagnoses_icd ON admissions.hadm_id = diagnoses_icd.hadm_id
+where diagnoses_icd.icd9_code not like '304%' and diagnoses_icd.icd9_code not like '305%'
+    )
+
+Q1 - In identifying pain scores, look at the list of item IDs with pain in them, do we want to include anything else? 
+Q2 - Shouldn't we be working with mean pain scores? it's coded also like that - to filter patients by those for whom we have mean and max pain scores
+Q3 - This barely matters, but do you want to exclude patients with ages greater than 89 just for sake of keeping the data clean, since we wouldn't know their exact ages and they are an extreme?
+Q4 - Does the code for creating ptdetails make sense? What would you join on - subject/hadm or icustayid?
+
+DO - Make comprehensive list of Opioid meds (for e.g. Methadone AND Methadone HCL.) Include even the medication which did not show results. 
+DO - Transfer Med SQL to SQLCode.txt
+
+-- Hydromorphone
+CREATE VIEW Hydromorphone AS
+SELECT subject_id, hadm_id, drug, formulary_drug_cd, drug_name_generic, form_unit_disp, route
+FROM prescriptions
+WHERE drug like '%Hydromorphone%' or formulary_drug_cd like '%HYDR%'
+and not drug like '%cortisone%' and not drug like '%oxyzine%' and not drug like '%Westcort%';
+
+-- Percocet
+CREATE VIEW Percocet AS
+SELECT subject_id, hadm_id, drug, formulary_drug_cd, drug_name_generic, form_unit_disp, route
+FROM prescriptions
+WHERE drug like '%perc%' or formulary_drug_cd like '%PERC%';
+
+-- Oxycodone 
+CREATE VIEW Oxycodone AS 
+SELECT subject_id, hadm_id, drug, formulary_drug_cd, drug_name_generic, form_unit_disp, route
+FROM prescriptions
+WHERE drug like '%oxyco%' or formulary_drug_cd like '%OXYCO%';
+
+-- Morphine
+CREATE VIEW Morphine AS
+SELECT subject_id, hadm_id, drug, formulary_drug_cd, drug_name_generic, form_unit_disp, route
+FROM prescriptions
+WHERE drug like '%Morph%' or formulary_drug_cd like '%MORP%';
+
+-- Fentanyl 
+CREATE VIEW Fentanyl AS
+SELECT subject_id, hadm_id, drug, formulary_drug_cd, drug_name_generic, form_unit_disp, route
+FROM prescriptions
+WHERE drug like '%FENT%' or formulary_drug_cd like '%FENT%';
+
+-- Methadone
+CREATE VIEW Methadone AS
+SELECT subject_id, hadm_id, drug, formulary_drug_cd, drug_name_generic, form_unit_disp, route
+FROM prescriptions
+WHERE drug like '%Methadone%' or drug like '%Methadone HCl%';
+

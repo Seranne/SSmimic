@@ -127,6 +127,11 @@ qplot(x = med.pain, data = med.pain, geom = "histogram")
 ```{r echo = T, cache = TRUE}
 # Extract OASIS scores from MIMIC
 oasis <- dbGetQuery(con, "select subject_id, oasis from oasis")
+write.csv(oasis, file = "oasis.csv")
+```
+
+```{r}
+oasis <- read_csv("/SSmimic/Final Code and Write up/oasis.csv")
 
 # Eliminate duplicates in oasis
 oasis <- oasis[-which(duplicated(oasis$subject_id)),]
