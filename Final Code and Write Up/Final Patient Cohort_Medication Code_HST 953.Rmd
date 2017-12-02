@@ -158,7 +158,7 @@ write.csv(main.table, file = "Main Table.csv")
 ```
 
 ```{r, cache = TRUE}
-main.table <- read.csv("/SSMimic/Final Code and Write Up/Main Table.csv")
+main.table <- read.csv("~/SSMimic/Final Code and Write Up/Main Table.csv")
 ```
 
 ```{r}
@@ -191,13 +191,13 @@ write.csv(methadone, file = "Methadone.csv")
 ```
 
 ```{r, cache = TRUE}
-Fentanyl <- read_csv("/SSmimic/Medication/Fentanyl.csv")
-Hydromorphone <- read_csv("/SSmimic/Medication/Hydromorphone.csv")
-Morphine <- read_csv("/SSmimic/Medication/Morphine.csv")
-Oxycodone <- read_csv("/SSmimic/Medication/Oxycodone.csv")
-Percocet <- read_csv("/SSmimic/Medication/Percocet.csv")
-Hydrocodone <- read_csv("/SSmimic/Medication/Hydrocodone.csv")
-Methadone <- read_csv("/SSmimic/Medication/Methadone.csv")
+Fentanyl <- read_csv("~/SSmimic/Medication/Fentanyl.csv")
+Hydromorphone <- read_csv("~/SSmimic/Medication/Hydromorphone.csv")
+Morphine <- read_csv("~/SSmimic/Medication/Morphine.csv")
+Oxycodone <- read_csv("~/SSmimic/Medication/Oxycodone.csv")
+Percocet <- read_csv("~/SSmimic/Medication/Percocet.csv")
+Hydrocodone <- read_csv("~/SSmimic/Medication/Hydrocodone.csv")
+Methadone <- read_csv("~/SSmimic/Medication/Methadone.csv")
 ```
 
 ```{r}
