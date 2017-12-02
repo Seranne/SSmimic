@@ -11,6 +11,7 @@ library(readr)
 library(tidyverse)
 library(ggplot2)
 library(dplyr)
+library(sjPlot)
 finaltable <- read_csv("~/SSmimic/Final Code and Write Up/finaltable.csv")
 head((finaltable))
 ```
@@ -73,6 +74,11 @@ finaltable$marital_status<- relevel(finaltable$marital_status, ref = "MARRIED")
 ```{r}
 firstlook <- glm(finaltable$formulary_drug_cd ~ finaltable$ethnicity + finaltable$mean.pain, family = binomial(link = "logit"))
 summary(firstlook)
+confint(firstlook)
+exp(coefficients(firstlook))
+exp(confint(firstlook))
+sjp.glm(firstlook)
+
 ```
 
 ```{r}
@@ -84,6 +90,10 @@ year2002_2005
 
 years1 <- glm(finaltable0205$formulary_drug_cd ~ finaltable0205$ethnicity + finaltable0205$mean.pain, family = binomial(link = "logit"))
 summary(years1)
+confint(years1)
+exp(coefficients(years1))
+exp(confint(years1))
+sjp.glm(years1)
 ```
 
 ```{r}
@@ -96,6 +106,10 @@ year2006_2008 <- ggplot(finaltable0608, aes(ethnicity, fill = formulary_drug_cd 
 year2006_2008
 years2 <- glm(finaltable0608$formulary_drug_cd ~ finaltable0608$ethnicity + finaltable0608$mean.pain, family = binomial(link = "logit"))
 summary(years2)
+confint(years2)
+exp(coefficients(years2))
+exp(confint(years2))
+sjp.glm(years2)
 ```
 ```{r}
 finaltable0911<- filter(finaltable, finaltable$admityear == "2009" |finaltable$admityear == "2010" |finaltable$admityear == "2011")
@@ -106,29 +120,61 @@ year2009_2011
 
 years3 <- glm(finaltable0911$formulary_drug_cd ~ finaltable0911$ethnicity + finaltable0911$mean.pain, family = binomial(link = "logit"))
 summary(years3)
+confint(years3)
+exp(coefficients(years3))
+exp(confint(years3))
+sjp.glm(years3)
 ```
 
 
 ```{r}
 secondlook <- glm(finaltable$formulary_drug_cd ~ finaltable$ethnicity + finaltable$mean.pain + finaltable$gender + finaltable$age + finaltable$insurance + finaltable$marital_status +finaltable$oasis, family = binomial(link = "logit"))
 summary(secondlook)
+confint(secondlook)
+exp(coefficients(secondlook))
+exp(confint(secondlook))
+sjp.glm(secondlook)
 ```
 
 ```{r}
 year1secondlook <- glm(finaltable0205$formulary_drug_cd ~ finaltable0205$ethnicity + finaltable0205$mean.pain + finaltable0205$gender + finaltable0205$age + finaltable0205$insurance + finaltable0205$marital_status+finaltable0205$oasis, family = binomial(link = "logit"))
 summary(year1secondlook)
+confint(year1secondlook)
+exp(coefficients(year1secondlook))
+exp(confint(year1secondlook))
+sjp.glm(year1secondlook)
 ```
 
 ```{r}
 year2secondlook <- glm(finaltable0608$formulary_drug_cd ~ finaltable0608$ethnicity + finaltable0608$mean.pain + finaltable0608$gender + finaltable0608$age + finaltable0608$insurance + finaltable0608$marital_status+finaltable0608$oasis, family = binomial(link = "logit"))
 summary(year2secondlook)
+summary(year2secondlook)
+confint(year2secondlook)
+exp(coefficients(year2secondlook))
+exp(confint(year2secondlook))
+sjp.glm(year2secondlook)
 ```
 
 ```{r}
 year3secondlook <- glm(finaltable0911$formulary_drug_cd ~ finaltable0911$ethnicity + finaltable0911$mean.pain + finaltable0911$gender + finaltable0911$age + finaltable0911$insurance + finaltable0911$marital_status +finaltable0911$oasis, family = binomial(link = "logit"))
 summary(year3secondlook)
+summary(year3secondlook)
+confint(year3secondlook)
+exp(coefficients(year3secondlook))
+exp(confint(year3secondlook))
+sjp.glm(year3secondlook)
 ```
 
 
+```{r}
+#checking the link between oasis and opioids in each race category:
+
+race_bl<- filter(finaltable,finaltable$ethnicity == "BLACK")
+a<- glm(race_bl$formulary_drug_cd ~ race_bl$oasis)
+summary(a)
+race_wh<- filter(finaltable,finaltable$ethnicity == "WHITE")
+b<- glm(race_wh$formulary_drug_cd ~ race_wh$oasis)
+summary(b)
+```
 
 
