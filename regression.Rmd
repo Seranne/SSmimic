@@ -130,5 +130,15 @@ summary(year3secondlook)
 ```
 
 
+```{r}
+#checking the link between oasis and opioids in each race category:
+
+race_bl<- filter(finaltable,finaltable$ethnicity == "BLACK")
+a<- glm(race_bl$formulary_drug_cd ~ race_bl$oasis)
+summary(a)
+race_wh<- filter(finaltable,finaltable$ethnicity == "WHITE")
+b<- glm(race_wh$formulary_drug_cd ~ race_wh$oasis)
+summary(b)
+```
 
 
