@@ -42,6 +42,7 @@ morphine <- dbGetQuery(con, "select * from Morphine")
 oxycodone <- dbGetQuery(con, "select * from Oxycodone")
 percocet <- dbGetQuery(con, "select * from Percocet")
 hydromorphone <- dbGetQuery(con, "select * from Hydromorphone")
+methadone <- dbGetQuery(con, "select * from Methadone")
 ```
 
 ```{r}
@@ -77,6 +78,7 @@ write.csv(fentanyl, file = "Fentanyl.csv")
 write.csv(morphine, file = "Morphine.csv")
 write.csv(oxycodone, file = "Oxycodone.csv")
 write.csv(percocet, file = "Percocet.csv")
-write.csv(percocet, file = "Hydromorphone.csv")
+write.csv(hydromorphone, file = "Hydromorphone.csv")
+write.csv(methadone, file = "Methadone.csv")
 ```
 

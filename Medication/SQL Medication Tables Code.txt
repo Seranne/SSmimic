@@ -34,4 +34,9 @@ SELECT subject_id, hadm_id, startdate, enddate, drug, formulary_drug_cd, drug_na
 FROM prescriptions
 WHERE drug like '%FENT%' or formulary_drug_cd like '%FENT%';
 
+# Methadone
 
+CREATE VIEW Methadone AS
+SELECT subject_id, hadm_id, drug, formulary_drug_cd, drug_name_generic, form_unit_disp, route
+FROM prescriptions
+WHERE drug like '%Methadone%' or drug like '%Methadone HCl%';
