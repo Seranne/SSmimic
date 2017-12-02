@@ -34,6 +34,7 @@ library(dplyr)
 require("RPostgreSQL")
 library(stringr)
 library(tidyverse)
+library(readr)
 ```
 
 The first chunk of code allows R to connect to MIMIC database:
@@ -176,48 +177,62 @@ hydromorphone <- dbGetQuery(con, "select * from Hydromorphone")
 methadone <- dbGetQuery(con, "select * from Methadone")
 
 write.csv(fentanyl, file = "Fentanyl.csv")
-read_csv("/SSmimic/Final Code and Write Up/Fentanyl.csv")
+#read_csv("~/SSmimic/Final Code and Write Up/Fentanyl.csv")
 write.csv(morphine, file = "Morphine.csv")
-read_csv("/SSmimic/Final Code and Write Up/Morphine.csv")
+#read_csv("~/SSmimic/Final Code and Write Up/Morphine.csv")
 write.csv(oxycodone, file = "Oxycodone.csv")
-read_csv("/SSmimic/Final Code and Write Up/Oxycodone.csv")
+#read_csv("~/SSmimic/Final Code and Write Up/Oxycodone.csv")
 write.csv(hydrocodone, file = "Hydrocodone.csv")
-read_csv("/SSmimic/Final Code and Write Up/Hydrocodone.csv")
+#read_csv("~/SSmimic/Final Code and Write Up/Hydrocodone.csv")
 write.csv(percocet, file = "Percocet.csv")
-read_csv("/SSmimic/Final Code and Write Up/Percocet.csv")
+#read_csv("~/SSmimic/Final Code and Write Up/Percocet.csv")
 write.csv(hydromorphone, file = "Hydromorphone.csv")
-read_csv("/SSmimic/Final Code and Write Up/Hydromorphone.csv")
+#read_csv("~/SSmimic/Final Code and Write Up/Hydromorphone.csv")
 write.csv(methadone, file = "Methadone.csv")
-read_csv("/SSmimic/Final Code and Write Up/Methadone.csv")
+#read_csv("~/SSmimic/Final Code and Write Up/Methadone.csv")
 ```
 
-```{r, echo = TRUE, cache = TRUE}
-# Create tables with no duplicated hadm_id
-Fent <- Fentanyl %>% distinct(hadm_id, .keep_all = TRUE)
-Hydrom <- Hydromorphone %>% distinct(hadm_id, .keep_all = TRUE)
-Morph <- Morphine %>% distinct(hadm_id, .keep_all = TRUE)
-Oxycod <- Oxycodone %>% distinct(hadm_id, .keep_all = TRUE)
+```{r}
+library(readr)
+Fentanyl <- read_csv("~/SSmimic/Medication/Fentanyl.csv")
+Hydromorphone <- read_csv("~/SSmimic/Medication/Hydromorphone.csv")
+Morphine <- read_csv("~/SSmimic/Medication/Morphine.csv")
+Oxycodone <- read_csv("~/SSmimic/Medication/Oxycodone.csv")
+Percocet <- read_csv("~/SSmimic/Medication/Percocet.csv")
+Hydrocodone <- read_csv("~/SSmimic/Medication/Hydrocodone.csv")
+Methadone <- read_csv("~/SSmimic/Medication/Methadone.csv")
+
+
+#create tables with no duplicated hadm_id
+library(dplyr)
+Fent<- Fentanyl %>% distinct(hadm_id, .keep_all = TRUE)
+Hydrom<- Hydromorphone %>% distinct(hadm_id, .keep_all = TRUE)
+Morph<- Morphine %>% distinct(hadm_id, .keep_all = TRUE)
+Oxycod<- Oxycodone %>% distinct(hadm_id, .keep_all = TRUE)
 Perco <- Percocet %>% distinct(hadm_id, .keep_all = TRUE)
-Hydrocod <- Hydrocodone %>% distinct(hadm_id, .keep_all = TRUE)
+Hydrocod<- Hydrocodone %>% distinct(hadm_id, .keep_all = TRUE)
 Methad <- Methadone %>% distinct(hadm_id, .keep_all = TRUE)
 
-# Create combined opioid medication table
-opioid <- rbind(Fent,Hydrom, Morph, Oxycod, Perco, Hydrocod, Methad)
-opioid_nohadmid <-  opioid %>% distinct(hadm_id, .keep_all = TRUE)
+#create combined opioid medication table
+opioid <- rbind(Fent,Hydrom, Morph, Oxycod, Perco, Hydrocod)
+opioid_nohadmid<-  opioid %>% distinct(hadm_id, .keep_all = TRUE)
 
-# Create .csv file for combined opioid prescriptions
+#create csv
 write.csv(opioid, file = "opioid.csv")
 
-# Filter table for only IV drug prescriptions and remove duplicated hadm_ids
-IVtable <- opioid[(opioid$route == "IV") |(opioid$route == "IV DRIP")|(opioid$route == "IVPCA") , ]
-IVtable_nodup <-  IVtable %>% distinct(hadm_id, .keep_all = TRUE)
-write.csv(IVtable_nodup, file = "IVtable_nodup.csv")
+#create  table with only IV drug presiscriptions and remove duplicated hadm_id
+
+IVtable<- opioid[(opioid$route == "IV") |(opioid$route == "IV DRIP")|(opioid$route == "IVPCA") , ]
+IVtable_nodup<-  IVtable %>% distinct(hadm_id, .keep_all = TRUE)
+write.csv(IVtable_nodup,file = "IVtable_nodup.csv")
 
 
-# Filter table for NO IV drug prescriptions and remove duplicated hadm_id
-oralopioid <- opioid[!((opioid$route == "IV") |(opioid$route == "IV DRIP")|(opioid$route == "IVPCA")), ]
-oralopioid_nodup <-  oralopioid %>% distinct(hadm_id, .keep_all = TRUE)
-write.csv(oralopioid_nodup, file = "oralopioid_nodup.csv")
+#create  table with NO IV drug presiscriptions and remove duplicated hadm_id
+
+oralopioid<- opioid[!((opioid$route == "IV") |(opioid$route == "IV DRIP")|(opioid$route == "IVPCA")), ]
+oralopioid_nodup<-  oralopioid %>% distinct(hadm_id, .keep_all = TRUE)
+write.csv(oralopioid_nodup,file = "oralopioid_nodup.csv")
+
 ```
 
 # Final Merge between patient cohort details (main.table.csv) and IV Opioid prescription information to ease analysis
