@@ -4,14 +4,18 @@ author: "Seranne Motilal and Shravanthi Seshasayee"
 date: "1 December 2017"
 output: html_document
 ---
+## Background
+
+The aim of our study is to identify if there is an association between a patient's demographic characteristics (age, gender, ethnicity, marital status and insurance coverage) and our outcome of interest: prescription of IV opioid medication (yes = 1, no = 0). We also investigate if this association has shown a difference in trends over time, between the years 2002 and 2011. 
+
+The following markdown is designed to search through the mimic database and find all patients with self-reported pain scores. Corresponding patient demographic, clinical and prescription characteristics will also be searched for and compiled. All patients with ICD-9 codes corresponding with drug dependence and abuse have been excluded.Patients with elixhauser scores greater than ___ have been excluded.
 
 # Subsetting Mimic for Final Cohort. 
-
 Demographic Characteristics: 
-- subject_id, hadm_id, icustay_id, age, gender, ethnicity, marital status, insurance status, admit year , 
+- subject_id, hadm_id, icustay_id, age, gender, ethnicity, marital status, insurance status, admit year, 
 Clinical Characteristics: 
 - mean pain, median pain, max pain, icu_los, oasis, e_score, 
-Medication Characteristics: 
+Prescription Characteristics: 
 - drug, drug_name_generic, formulary_drug_cd, form_unit_disp, route
 Inclusion Criteria
 - All patients with self-reported pain scores
@@ -19,5 +23,163 @@ To Exclude:
 - All patients with ICD - 9 codes for Drug Dependence or Abuse [codes beginning with 304 or 305]
 - All patients with Elixhauser scores > _____
 - Years 2001 and 2012
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(mgcv)
+library(dplyr)
+require("RPostgreSQL")
+library(stringr)
+library(tidyverse)
+```
+
+The first chunk of code allows R to connect to MIMIC database:
+```{r echo = F}
+# Loads the PostgreSQL driver
+drv <- dbDriver("PostgreSQL") 
+
+# Creates a connection to the postgres database (MIMIC)
+# Note that "con" will be used later in each connection to the database
+
+con <- dbConnect(drv, dbname = "mimic",
+                 host = "localhost", port = 5432,
+                 user = "postgres", password = "postgres")
+
+dbGetQuery(con, "set search_path to mimiciii")
+```
+
+The following code chunks use tables derived from the MIMIC database to create a dataframe with all the variables of interest for each patient.
+
+## Patient Details: Demographic and Admission Characteristics 
+```{r echo = T}
+# First table contains subject_id, hadm_id, icustay_id, age, gender, ethnicity, marital status, insurance status, los_hospital, los_icu. Excludes patients with ICD-9 diagnoses codes for drug dependence or abuse
+# SQL code for Materialized View "ptdetails" available from SQLCode.txt
+ptdetails <- dbGetQuery(con, "select * from patientdetails")
+
+# adding admityear: Permissions required to access Year data
+years <- read_csv("/SSmimic/years.csv")
+ptdetails <- merge(ptdetails, years, by = "hadm_id")
+
+# Removing duplicates
+age.table <- age.table[-which(duplicated(age.table$hadm_id)),]
+```
+
+## Patient Details: Clinical Characteristics 
+# Pain scores
+```{r echo = T}
+# Search through d_items table (containing item ids from both Metavision and CareVue databases) to derive item ids reflecting self-reported pain scores recorded in MIMIC
+pain_items <- dbGetQuery(con, "select itemid, label from d_items where label like  '%pain%' or label like '%Pain%'")
+pain_items
+```
+
+Looking at the table above, these are the following item_ids that will be used to obtain pain level from the chartevents tables: 1044 (Pain Level - CareVue), 1045 (Pain Level/Response - CareVue), 225813 (Baseline pain level - Metavision), 224409 (Pain Level Response - Metavision), 227881 (Pain (0-10)), 223791 (Pain Level - Metavision).
+
+```{r echo = T}
+# Select all pain level measurements from the chartevents table and convert all measures to the same format
+pain_table <- dbGetQuery(con, "select * from mimiciii.chartevents where itemid  in (1044, 1045, 225813, 224409, 227881, 223791)")
+for(i in 1:nrow(pain_table)){
+  if(length(
+  unique(na.omit(as.numeric(unlist(strsplit(unlist(pain_table$value[i]), 
+                                            "[^0-9]+")))))) == 1){
+    pain_table$valuenum[i] <- unique(na.omit(as.numeric(unlist(strsplit(unlist(pain_table$value[i]), 
+                                                                 "[^0-9]+")))))
+  }
+  if(length(
+    unique(na.omit(as.numeric(unlist(strsplit(unlist(pain_table$value[i]), 
+                                              "[^0-9]+")))))) == 2){
+                      pain_table$valuenum[i] <- 0
+                                              }
+}
+
+```
+
+
+```{r echo = T}
+# Calculate mean, median, and max pain scores for each patient per hospital stay. Return histogram of findings.
+avg.pain <- aggregate(valuenum ~ hadm_id, data = pain_table, mean)
+colnames(avg.pain) = c("hadm_id", "mean.pain")
+qplot(x = round(mean.pain), data = avg.pain, geom = "histogram") + ggtitle("Avg Pain level Hist")
+
+max.pain <- aggregate(valuenum ~ hadm_id, data = pain_table, max)
+colnames(max.pain) = c("hadm_id", "max_pain")
+max.pain$max_pain <- as.numeric(max.pain$max_pain)
+qplot(x = max_pain, data = max.pain, geom = "histogram") + ggtitle(" Max Pain level Hist")
+
+med.pain <- aggregate(valuenum ~ hadm_id, data = pain_table, median)
+colnames(med.pain) = c("hadm_id", "med.pain")
+med.pain$med.pain <- as.numeric(med.pain$med.pain)
+
+qplot(x = med.pain, data = med.pain, geom = "histogram")
+```
+
+
+```{r echo = T}
+# Extract OASIS scores from MIMIC
+oasis <- dbGetQuery(con, "select subject_id, oasis from oasis")
+
+# Eliminate duplicates in oasis
+oasis <- oasis[-which(duplicated(oasis$subject_id)),]
+```
+
+
+```{r echo = T}
+# Extract Elixhauser scores from MIMIC 
+elix <- dbGetQuery(con, "select * from mimiciii.elixhauser_ahrq_no_drg_all_icd")
+elix$e_score <- apply(elix[,3:32], 1, sum)
+```
+
+
+
+# Merge all tables into one main.table, which will be used to run analysis
+```{r echo = T}
+main.table <- merge(x = ptdetails, y = avg.pain, all.x = F, all.y = T)
+main.table <- merge(x = max.pain, y = main.table, all.x = F, all.y = T)
+main.table <- merge(x = med.pain, y = main.table, all.x = T, all.y = F)
+main.table <- merge(x = main.table, y = oasis, all.x = T, all.y = F)
+main.table <- merge(x = main.table, y = elix[,c(2,33)], all.x = T, all.y = F)
+
+
+# Sets pts >89 yo (300 yo in database) to the median of 91.4
+main.table$age[which(main.table$age > 300)] <- 91.4
+
+
+```
+
+#Total sample size
+```{r echo = T}
+#length(unique(pain_table$hadm_id)) # All CABG patients
+```
+
+# Generating Main Table
+```{r echo = F}
+write.csv(main.table, "./main.table.csv")
+View(main.table)
+head(main.table)
+
+#Save hadm_id from cohort to use in medication extraction
+write.csv(main.table$hadm_id, "./cohort_hadmi_id.csv")
+```
+
+## Medication: Opioid Medications were defined to include: 
+Fentanyl, Remifentanil, Alfentanil, Sufentanil, Morphine, Oxycodone, Percocet, Hydrocodone, Hydrocodone Bitartrate, Oxycodone Hydrochloride, Hydromorphone Hydrochloride, and Methadone. SQL Code for extracting these prescriptions from the table Prescriptions, is available from SQLCode.txt.
+
+```{r}
+# Extract drugs from Prescriptions, and write .csv files for each:
+fentanyl <- dbGetQuery(con, "select * from Fentanyl")
+morphine <- dbGetQuery(con, "select * from Morphine")
+oxycodone <- dbGetQuery(con, "select * from Oxycodone")
+percocet <- dbGetQuery(con, "select * from Percocet")
+hydromorphone <- dbGetQuery(con, "select * from Hydromorphone")
+methadone <- dbGetQuery(con, "select * from Methadone")
+
+write.csv(fentanyl, file = "Fentanyl.csv")
+write.csv(morphine, file = "Morphine.csv")
+write.csv(oxycodone, file = "Oxycodone.csv")
+write.csv(percocet, file = "Percocet.csv")
+write.csv(hydromorphone, file = "Hydromorphone.csv")
+write.csv(methadone, file = "Methadone.csv")
+```
 
 
