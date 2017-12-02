@@ -8,7 +8,9 @@ output: html_document
 
 The aim of our study is to identify if there is an association between a patient's demographic characteristics (age, gender, ethnicity, marital status and insurance coverage) and our outcome of interest: prescription of IV opioid medication (yes = 1, no = 0). We also investigate if this association has shown a difference in trends over time, between the years 2002 and 2011. 
 
-The following markdown is designed to search through the mimic database and find all patients with self-reported pain scores. Corresponding patient demographic, clinical and prescription characteristics will also be searched for and compiled. All patients with ICD-9 codes corresponding with drug dependence and abuse have been excluded.Patients with elixhauser scores greater than ___ have been excluded.
+The following markdown is designed to search through the mimic database and generate a table containing details of patients with self-reported pain scores between the years 2002 and 2011, their demographic and clinical characteristics, and corresponding IV opioid prescription information. 
+
+All patients with ICD-9 codes corresponding with drug dependence and abuse have been excluded.Patients with elixhauser scores greater than 10 have been excluded.
 
 # Subsetting Mimic for Final Cohort. 
 Demographic Characteristics: 
@@ -21,8 +23,7 @@ Inclusion Criteria
 - All patients with self-reported pain scores
 To Exclude: 
 - All patients with ICD - 9 codes for Drug Dependence or Abuse [codes beginning with 304 or 305]
-- All patients with Elixhauser scores > _____
-- Years 2001 and 2012
+- All patients with Elixhauser scores > 10
 
 
 ```{r setup, include=FALSE}
@@ -62,9 +63,19 @@ ptdetails <- dbGetQuery(con, "select * from patientdetails")
 years <- read_csv("/SSmimic/years.csv")
 ptdetails <- merge(ptdetails, years, by = "hadm_id")
 
+# Filter out years 2001 and 2012 as they are incomplete years
+ptdetails <- filter(ptdetails, !ptdetails$admityear == "2001" & !ptdetails$admityear == "2012")
+
+# Sets pts >89 yo (300 yo in database) to the median of 91.4
+ptdetails$age[which(ptdetails$age > 300)] <- 91.4
+
 # Removing duplicates
-age.table <- age.table[-which(duplicated(age.table$hadm_id)),]
+ptdetails <- ptdetails[-which(duplicated(ptdetails$hadm_id)),]
+
+# Sample size
+length(unique(ptdetails$hadm_id))
 ```
+
 
 ## Patient Details: Clinical Characteristics 
 # Pain scores
@@ -130,46 +141,37 @@ elix <- dbGetQuery(con, "select * from mimiciii.elixhauser_ahrq_no_drg_all_icd")
 elix$e_score <- apply(elix[,3:32], 1, sum)
 ```
 
-
-
-# Merge all tables into one main.table, which will be used to run analysis
+# Merge all above variables into one main cohort table, which will be used to run analysis
 ```{r echo = T}
+# Table will contain only patients for whom avg.pain scores are available
 main.table <- merge(x = ptdetails, y = avg.pain, all.x = F, all.y = T)
-main.table <- merge(x = max.pain, y = main.table, all.x = F, all.y = T)
-main.table <- merge(x = med.pain, y = main.table, all.x = T, all.y = F)
+main.table <- merge(x = ptdetails, y = max.pain, all.x = T, all.y = F)
+main.table <- merge(x = ptdetails, y = med.pain, all.x = T, all.y = F)
 main.table <- merge(x = main.table, y = oasis, all.x = T, all.y = F)
 main.table <- merge(x = main.table, y = elix[,c(2,33)], all.x = T, all.y = F)
 
-
-# Sets pts >89 yo (300 yo in database) to the median of 91.4
-main.table$age[which(main.table$age > 300)] <- 91.4
-
-
+# Exclude patients with an Elixhauser score that is 10 or more
+main.table <- filter(main.table, main.table$e_score < 10)
 ```
 
-#Total sample size
-```{r echo = T}
-#length(unique(pain_table$hadm_id)) # All CABG patients
-```
-
-# Generating Main Table
+# Generating Cohort Table
 ```{r echo = F}
 write.csv(main.table, "./main.table.csv")
 View(main.table)
-head(main.table)
 
-#Save hadm_id from cohort to use in medication extraction
+# Save hadm_id from cohort to use in medication extraction
 write.csv(main.table$hadm_id, "./cohort_hadmi_id.csv")
 ```
 
 ## Medication: Opioid Medications were defined to include: 
-Fentanyl, Remifentanil, Alfentanil, Sufentanil, Morphine, Oxycodone, Percocet, Hydrocodone, Hydrocodone Bitartrate, Oxycodone Hydrochloride, Hydromorphone Hydrochloride, and Methadone. SQL Code for extracting these prescriptions from the table Prescriptions, is available from SQLCode.txt.
+Fentanyl, Remifentanil, Alfentanil, Sufentanil, Morphine, Oxycodone, Percocet, Hydrocodone, Hydrocodone Bitartrate, Oxycodone Hydrochloride, Hydromorphone Hydrochloride, and Methadone. SQL Codes for extracting these prescriptions from the table Prescriptions, are available from SQLCode.txt.
 
 ```{r}
 # Extract drugs from Prescriptions, and write .csv files for each:
 fentanyl <- dbGetQuery(con, "select * from Fentanyl")
 morphine <- dbGetQuery(con, "select * from Morphine")
 oxycodone <- dbGetQuery(con, "select * from Oxycodone")
+hydrocodone <- dbGetQuery(con, "select * from Hydrocodone")
 percocet <- dbGetQuery(con, "select * from Percocet")
 hydromorphone <- dbGetQuery(con, "select * from Hydromorphone")
 methadone <- dbGetQuery(con, "select * from Methadone")
@@ -177,9 +179,42 @@ methadone <- dbGetQuery(con, "select * from Methadone")
 write.csv(fentanyl, file = "Fentanyl.csv")
 write.csv(morphine, file = "Morphine.csv")
 write.csv(oxycodone, file = "Oxycodone.csv")
+write.csv(hydrocodone, file = "Hydrocodone.csv")
 write.csv(percocet, file = "Percocet.csv")
 write.csv(hydromorphone, file = "Hydromorphone.csv")
 write.csv(methadone, file = "Methadone.csv")
 ```
 
+```{r}
+# Create tables with no duplicated hadm_id
+Fent <- Fentanyl %>% distinct(hadm_id, .keep_all = TRUE)
+Hydrom <- Hydromorphone %>% distinct(hadm_id, .keep_all = TRUE)
+Morph <- Morphine %>% distinct(hadm_id, .keep_all = TRUE)
+Oxycod <- Oxycodone %>% distinct(hadm_id, .keep_all = TRUE)
+Perco <- Percocet %>% distinct(hadm_id, .keep_all = TRUE)
+Hydrocod <- Hydrocodone %>% distinct(hadm_id, .keep_all = TRUE)
 
+# Create combined opioid medication table
+opioid <- rbind(Fent,Hydrom, Morph, Oxycod, Perco, Hydrocod)
+opioid_nohadmid <-  opioid %>% distinct(hadm_id, .keep_all = TRUE)
+
+# Create .csv file for combined opioid prescriptions
+write.csv(opioid, file = "opioid.csv")
+
+# Filter table for only IV drug prescriptions and remove duplicated hadm_ids
+IVtable <- opioid[(opioid$route == "IV") |(opioid$route == "IV DRIP")|(opioid$route == "IVPCA") , ]
+IVtable_nodup <-  IVtable %>% distinct(hadm_id, .keep_all = TRUE)
+write.csv(IVtable_nodup, file = "IVtable_nodup.csv")
+
+
+# Filter table for NO IV drug prescriptions and remove duplicated hadm_id
+oralopioid <- opioid[!((opioid$route == "IV") |(opioid$route == "IV DRIP")|(opioid$route == "IVPCA")), ]
+oralopioid_nodup <-  oralopioid %>% distinct(hadm_id, .keep_all = TRUE)
+write.csv(oralopioid_nodup, file = "oralopioid_nodup.csv")
+```
+
+# Final Merge between patient cohort details (main.table.csv) and IV Opioid prescription information to ease analysis
+
+```{r}
+finaltable <- left_join(main.table , IVtable_nodup, "hadm_id")
+```
