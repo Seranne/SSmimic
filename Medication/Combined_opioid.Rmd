@@ -11,6 +11,7 @@ Morphine <- read_csv("~/SSmimic/Medication/Morphine.csv")
 Oxycodone <- read_csv("~/SSmimic/Medication/Oxycodone.csv")
 Percocet <- read_csv("~/SSmimic/Medication/Percocet.csv")
 Hydrocodone <- read_csv("~/SSmimic/Medication/Hydrocodone.csv")
+Methadone <- read_csv("~/SSmimic/Medication/Methadone.csv")
 
 
 #create tables with no duplicated hadm_id
@@ -21,6 +22,7 @@ Morph<- Morphine %>% distinct(hadm_id, .keep_all = TRUE)
 Oxycod<- Oxycodone %>% distinct(hadm_id, .keep_all = TRUE)
 Perco <- Percocet %>% distinct(hadm_id, .keep_all = TRUE)
 Hydrocod<- Hydrocodone %>% distinct(hadm_id, .keep_all = TRUE)
+Methad <- Methadone %>% distinct(hadm_id, .keep_all = TRUE)
 
 #create combined opioid medication table
 opioid <- rbind(Fent,Hydrom, Morph, Oxycod, Perco, Hydrocod)

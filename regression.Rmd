@@ -15,11 +15,12 @@ finaltable <- read_csv("~/SSmimic/finaltable.csv")
 head((finaltable))
 ```
 ```{r}
-finaltable$insurance.y<- as.factor(finaltable$insurance.y)
+finaltable$insurance<- as.factor(finaltable$insurance)
 finaltable$ethnicity<- as.factor(finaltable$ethnicity)
-finaltable$marital_status.y<- as.factor(finaltable$marital_status.y)
+final
+finaltable$marital_status<- as.factor(finaltable$marital_status)
 finaltable$ethnicity<- relevel(finaltable$ethnicity, ref = "WHITE")
-finaltable$marital_status.y<- relevel(finaltable$marital_status.y, ref = "MARRIED")
+finaltable$marital_status<- relevel(finaltable$marital_status, ref = "MARRIED")
 ```
 
 ```{r}
@@ -62,22 +63,22 @@ summary(years3)
 
 
 ```{r}
-secondlook <- glm(finaltable$formulary_drug_cd ~ finaltable$ethnicity + finaltable$mean.pain + finaltable$gender + finaltable$age + finaltable$insurance.y + finaltable$marital_status.y +finaltable$oasis, family = binomial(link = "logit"))
+secondlook <- glm(finaltable$formulary_drug_cd ~ finaltable$ethnicity + finaltable$mean.pain + finaltable$gender + finaltable$age + finaltable$insurance + finaltable$marital_status +finaltable$oasis, family = binomial(link = "logit"))
 summary(secondlook)
 ```
 
 ```{r}
-year1secondlook <- glm(finaltable0205$formulary_drug_cd ~ finaltable0205$ethnicity + finaltable0205$mean.pain + finaltable0205$gender + finaltable0205$age + finaltable0205$insurance.y + finaltable0205$marital_status.y+finaltable0205$oasis, family = binomial(link = "logit"))
+year1secondlook <- glm(finaltable0205$formulary_drug_cd ~ finaltable0205$ethnicity + finaltable0205$mean.pain + finaltable0205$gender + finaltable0205$age + finaltable0205$insurance + finaltable0205$marital_status+finaltable0205$oasis, family = binomial(link = "logit"))
 summary(year1secondlook)
 ```
 
 ```{r}
-year2secondlook <- glm(finaltable0608$formulary_drug_cd ~ finaltable0608$ethnicity + finaltable0608$mean.pain + finaltable0608$gender + finaltable0608$age + finaltable0608$insurance.y + finaltable0608$marital_status.y+finaltable0608$oasis, family = binomial(link = "logit"))
+year2secondlook <- glm(finaltable0608$formulary_drug_cd ~ finaltable0608$ethnicity + finaltable0608$mean.pain + finaltable0608$gender + finaltable0608$age + finaltable0608$insurance + finaltable0608$marital_status+finaltable0608$oasis, family = binomial(link = "logit"))
 summary(year2secondlook)
 ```
 
 ```{r}
-year3secondlook <- glm(finaltable0911$formulary_drug_cd ~ finaltable0911$ethnicity + finaltable0911$mean.pain + finaltable0911$gender + finaltable0911$age + finaltable0911$insurance.y + finaltable0911$marital_status.y +finaltable0911$oasis, family = binomial(link = "logit"))
+year3secondlook <- glm(finaltable0911$formulary_drug_cd ~ finaltable0911$ethnicity + finaltable0911$mean.pain + finaltable0911$gender + finaltable0911$age + finaltable0911$insurance + finaltable0911$marital_status +finaltable0911$oasis, family = binomial(link = "logit"))
 summary(year3secondlook)
 ```
 
