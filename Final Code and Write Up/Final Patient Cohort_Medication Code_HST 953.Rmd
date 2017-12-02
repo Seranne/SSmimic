@@ -72,9 +72,6 @@ ptdetails$age[which(ptdetails$age > 300)] <- 91.4
 
 # Removing duplicates
 ptdetails <- ptdetails[-which(duplicated(ptdetails$hadm_id)),]
-
-# Sample size
-length(unique(ptdetails$hadm_id))
 ```
 
 
@@ -158,8 +155,13 @@ main.table <- filter(main.table, main.table$e_score < 10)
 # Generating Cohort Table
 ```{r echo = F}
 write.csv(main.table, file = "Main Table.csv")
-main.table <- read.csv("/SSMimic/Final Code and Write Up/Main Table.csv")
+```
 
+```{r, cache = TRUE}
+main.table <- read.csv("/SSMimic/Final Code and Write Up/Main Table.csv")
+```
+
+```{r}
 # Save hadm_id from cohort to use in medication extraction
 write.csv(main.table$hadm_id, "./cohort_hadmi_id.csv")
 ```
@@ -186,7 +188,9 @@ write.csv(hydrocodone, file = "Hydrocodone.csv")
 write.csv(percocet, file = "Percocet.csv")
 write.csv(hydromorphone, file = "Hydromorphone.csv")
 write.csv(methadone, file = "Methadone.csv")
+```
 
+```{r, cache = TRUE}
 Fentanyl <- read_csv("/SSmimic/Medication/Fentanyl.csv")
 Hydromorphone <- read_csv("/SSmimic/Medication/Hydromorphone.csv")
 Morphine <- read_csv("/SSmimic/Medication/Morphine.csv")
@@ -229,8 +233,13 @@ write.csv(oralopioid_nodup,file = "oralopioid_nodup.csv")
 ```
 
 # Final Merge between patient cohort details (main.table.csv) and IV Opioid prescription information to ease analysis
-
 ```{r, cache = TRUE}
 finaltable <- left_join(main.table , IVtable_nodup, "hadm_id")
+finaltable <-  select(finaltable, "subject_id.y", "hadm_id", "icustay_id", "age", "gender", "ethnicity", "marital_status", "insurance", "los_hospital", "los_icu", "admityear", "mean.pain", "med.pain", "max_pain", "oasis", "e_score", "drug", "drug_name_generic", "formulary_drug_cd", "form_unit_disp", "route")
+colnames(finaltable)[1] <- "subject_id"
+write.csv(finaltable, file = "finaltable.csv")
 View(finaltable)
+
+# Sample size
+length(unique(finaltable$hadm_id))
 ```
