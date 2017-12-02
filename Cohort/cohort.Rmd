@@ -26,7 +26,7 @@ head(main_table)
 ```{r}
 #Merging years with main.table
 #>>>>>>> d9d4abefe32dcd4d82d6c5a33251ba031172e8c9
-years <- read_csv("D:/Desktop/ss hst project/years.csv")
+years <- read_csv("~/SSmimic/years.csv")
 cohort<- merge(main_table,years,by="hadm_id")
 write.csv(cohort, file = "cohort.csv")
 ```
@@ -102,11 +102,39 @@ finaltable$ethnicity <- ifelse(grepl("PORTU",finaltable$ethnicity),"HISPANIC", f
 
 finaltable$ethnicity[is.na(finaltable$ethnicity)]<-"OTHER"
 
+#categorize marital status into 4 categories 
+
+finaltable$marital_status.y <- ifelse(grepl("MARRIED",finaltable$marital_status.y),"MARRIED", finaltable$marital_status.y)
+finaltable$marital_status.y <- ifelse(grepl("LIFE PARTNER",finaltable$marital_status.y),"MARRIED", finaltable$marital_status.y)
+finaltable$marital_status.y <- ifelse(grepl("DIVORCED",finaltable$marital_status.y),"DIVORCED/WIDOWED", finaltable$marital_status.y)
+finaltable$marital_status.y <- ifelse(grepl("SEPARATED",finaltable$marital_status.y),"DIVORCED/WIDOWED", finaltable$marital_status.y)
+
+finaltable$marital_status.y <- ifelse(grepl("WIDOW",finaltable$marital_status.y),"DIVORCED/WIDOWED", finaltable$marital_status.y)
+finaltable$marital_status.y <- ifelse(grepl("UN",finaltable$marital_status.y),"OTHER", finaltable$marital_status.y)
+
+finaltable$marital_status.y[is.na(finaltable$marital_status.y)]<-"OTHER"
+
+#categorize insurance into 3 catergories
+
+finaltable$insurance.y <- ifelse(grepl("Medi",finaltable$insurance.y),"Government", finaltable$insurance.y)
+
+#check that ethnicity, marital status and insurance were correctly categorised
+
 unique(finaltable$ethnicity)
+
+unique(finaltable$marital_status.y)
+
+unique(finaltable$insurance.y)
+
+#exclude patients with an Elixhauser score that is 10 or more
+finaltable<- filter(finaltable, finaltable$e_score < 10)
 
 #filter out years 2001 and 2012 as they are incomplete years and select for relevant columns
 
 finaltable<- filter(finaltable, !finaltable$admityear == "2001" & !finaltable$admityear == "2012")
+
+#select relevant columns
+
 finaltable<- select(finaltable,"subject_id.x", "hadm_id", "med.pain", "age", "gender", "ethnicity","max_pain", "mean.pain", "oasis", "e_score", "admityear", "drug", "formulary_drug_cd", "drug_name_generic", "marital_status.y","insurance.y")
 
 #write csv final table: cohort plus IV opioids woth no duplicated hadm_id's
