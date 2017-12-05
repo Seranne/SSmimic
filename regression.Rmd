@@ -9,11 +9,65 @@ library(tidyverse)
 library(ggplot2)
 library(dplyr)
 library(sjPlot)
+library(survival)
 ```
 
 ```{r}
 finaltable <- read_csv("/SSmimic/Final Code and Write Up/finaltable.csv")
 ```
+
+
+```{r}
+# categorize race into 4 categories
+
+finaltable$ethnicity <- ifelse(grepl("BLACK",finaltable$ethnicity),"BLACK", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("WHITE",finaltable$ethnicity),"WHITE", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("HISPANIC",finaltable$ethnicity),"HISPANIC", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("ASIAN",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("UN",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("MUL",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("INDIAN",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("SOUTH",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("ISLAND",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("DECL",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("EAST",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("PORTU",finaltable$ethnicity),"HISPANIC", finaltable$ethnicity)
+
+finaltable$ethnicity[is.na(finaltable$ethnicity)]<-"OTHER"
+
+#categorize marital status into 4 categories 
+
+finaltable$marital_status <- ifelse(grepl("MARRIED",finaltable$marital_status),"MARRIED", finaltable$marital_status)
+finaltable$marital_status <- ifelse(grepl("LIFE PARTNER",finaltable$marital_status),"MARRIED", finaltable$marital_status)
+finaltable$marital_status <- ifelse(grepl("DIVORCED",finaltable$marital_status),"DIVORCED/WIDOWED", finaltable$marital_status)
+finaltable$marital_status <- ifelse(grepl("SEPARATED",finaltable$marital_status),"DIVORCED/WIDOWED", finaltable$marital_status)
+
+finaltable$marital_status <- ifelse(grepl("WIDOW",finaltable$marital_status),"DIVORCED/WIDOWED", finaltable$marital_status)
+finaltable$marital_status <- ifelse(grepl("UN",finaltable$marital_status),"OTHER", finaltable$marital_status)
+
+finaltable$marital_status[is.na(finaltable$marital_status)]<-"OTHER"
+
+#categorize insurance into 3 catergories
+
+finaltable$insurance <- ifelse(grepl("Medi",finaltable$insurance),"Government", finaltable$insurance)
+
+#check that ethnicity, marital status and insurance were correctly categorised
+
+unique(finaltable$ethnicity)
+
+unique(finaltable$marital_status)
+
+unique(finaltable$insurance)
+```
+
+```{r}
+finaltable$insurance<- as.factor(finaltable$insurance)
+finaltable$ethnicity<- as.factor(finaltable$ethnicity)
+finaltable$marital_status<- as.factor(finaltable$marital_status)
+finaltable$ethnicity<- relevel(finaltable$ethnicity, ref = "WHITE")
+finaltable$marital_status<- relevel(finaltable$marital_status, ref = "MARRIED")
+```
+
 
 ```{r}
 primarymodel <- glm(finaltable$drug ~ finaltable$ethnicity, family = binomial(link = "logit"))
@@ -36,7 +90,7 @@ sjp.glm(firstlook)
 
 #Conditional Logistic Regression 
 ```{r}
-cond <- clogit(finaltable$drug ~ finaltable$ethnicity + strata(finaltable$mean.pain), method = "exact")
+cond <- clogit(finaltable$drug ~ finaltable$age + strata(finaltable$mean.pain), method = "exact")
 ```
 
 #Predictive Probability plot 
