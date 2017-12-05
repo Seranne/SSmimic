@@ -262,6 +262,8 @@ length(unique(finaltable$hadm_id))
 
 ```{r}
 finaltable <- read_csv("~/SSmimic/Final Code and Write Up/finaltable.csv")
+finaltable<- finaltable[!is.na(finaltable$admityear),]
+
 ```
 
 
@@ -307,6 +309,10 @@ unique(finaltable$ethnicity)
 unique(finaltable$marital_status)
 
 unique(finaltable$insurance)
+
+write.csv(finaltable, file = "finaltable.csv")
+
+
 ```
 
 
