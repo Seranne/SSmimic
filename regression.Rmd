@@ -14,6 +14,8 @@ library(dplyr)
 library(sjPlot)
 finaltable <- read_csv("~/SSmimic/Final Code and Write Up/finaltable.csv")
 head(finaltable)
+unique(finaltable$drug)
+sum(finaltable$formulary_drug_cd == "1" )
 ```
 ```{r}
 #Replacing NA to 0 and receiving an IV opioid to 1:
