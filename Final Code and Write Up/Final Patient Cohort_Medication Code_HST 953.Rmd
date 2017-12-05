@@ -253,7 +253,7 @@ finaltable$drug<- ifelse(is.na(finaltable$drug),0,1)
 View(finaltable)
 ```
 
-#Writing final .csv
+#Writing finaltable .csv
 ```{r}
 write.csv(finaltable, file = "finaltable.csv")
 # Sample size
