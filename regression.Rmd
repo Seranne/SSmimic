@@ -12,7 +12,7 @@ library(tidyverse)
 library(ggplot2)
 library(dplyr)
 library(sjPlot)
-finaltable <- read_csv("/SSmimic/Final Code and Write Up/finaltable.csv")
+finaltable <- read_csv("~/SSmimic/Final Code and Write Up/finaltable.csv")
 head(finaltable)
 ```
 ```{r}
@@ -72,6 +72,17 @@ finaltable$marital_status<- relevel(finaltable$marital_status, ref = "MARRIED")
 ```
 
 ```{r}
+primarymodel <- glm(finaltable$formulary_drug_cd ~ finaltable$ethnicity, family = binomial(link = "logit"))
+summary(primarymodel)
+confint(primarymodel)
+exp(coefficients(primarymodel))
+exp(confint(primarymodel))
+sjp.glm(primarymodel)
+```
+
+
+
+```{r}
 firstlook <- glm(finaltable$formulary_drug_cd ~ finaltable$ethnicity + finaltable$mean.pain, family = binomial(link = "logit"))
 summary(firstlook)
 confint(firstlook)
@@ -112,13 +123,15 @@ lines(finaltable$mean.pain, upper, lty = 2)
 
 
 ```{r}
+#Unadjusted regression for year 1
+
 finaltable0205<- filter(finaltable, finaltable$admityear == "2002" |finaltable$admityear == "2003" |finaltable$admityear == "2004" |finaltable$admityear == "2005" )
 year2002_2005 <- ggplot(finaltable0205, aes(ethnicity, fill = formulary_drug_cd == "1")) + 
                  geom_bar(position = "fill") + 
                  labs(x = "Ethnicity", fill = "Received IV Opioids")
 year2002_2005
 
-years1 <- glm(finaltable0205$formulary_drug_cd ~ finaltable0205$ethnicity + finaltable0205$mean.pain, family = binomial(link = "logit"))
+years1 <- glm(finaltable0205$formulary_drug_cd ~ finaltable0205$ethnicity, family = binomial(link = "logit"))
 summary(years1)
 confint(years1)
 exp(coefficients(years1))
@@ -127,6 +140,8 @@ sjp.glm(years1)
 ```
 
 ```{r}
+#Unadjusted regression for year 2
+
 finaltable0608<- filter(finaltable, finaltable$admityear == "2006" |finaltable$admityear == "2007" |finaltable$admityear == "2008")
 
 year2006_2008 <- ggplot(finaltable0608, aes(ethnicity, fill = formulary_drug_cd == "1")) + 
@@ -134,7 +149,7 @@ year2006_2008 <- ggplot(finaltable0608, aes(ethnicity, fill = formulary_drug_cd 
                  labs(x = "Ethnicity", fill = "Received IV Opioids") 
 
 year2006_2008
-years2 <- glm(finaltable0608$formulary_drug_cd ~ finaltable0608$ethnicity + finaltable0608$mean.pain, family = binomial(link = "logit"))
+years2 <- glm(finaltable0608$formulary_drug_cd ~ finaltable0608$ethnicity, family = binomial(link = "logit"))
 summary(years2)
 confint(years2)
 exp(coefficients(years2))
@@ -142,13 +157,15 @@ exp(confint(years2))
 sjp.glm(years2)
 ```
 ```{r}
+#Unadjusted regression for year 3
+
 finaltable0911<- filter(finaltable, finaltable$admityear == "2009" |finaltable$admityear == "2010" |finaltable$admityear == "2011")
 year2009_2011 <- ggplot(finaltable0911, aes(ethnicity, fill = formulary_drug_cd == "1")) + 
                  geom_bar(position = "fill") + 
                  labs(x = "Ethnicity", fill = "Received IV Opioids") 
 year2009_2011
 
-years3 <- glm(finaltable0911$formulary_drug_cd ~ finaltable0911$ethnicity + finaltable0911$mean.pain, family = binomial(link = "logit"))
+years3 <- glm(finaltable0911$formulary_drug_cd ~ finaltable0911$ethnicity, family = binomial(link = "logit"))
 summary(years3)
 confint(years3)
 exp(coefficients(years3))
@@ -158,7 +175,9 @@ sjp.glm(years3)
 
 
 ```{r}
-secondlook <- glm(finaltable$formulary_drug_cd ~ finaltable$ethnicity + finaltable$mean.pain + finaltable$gender + finaltable$age + finaltable$insurance + finaltable$marital_status +finaltable$oasis, family = binomial(link = "logit"))
+#adjusted global test for all the years
+
+secondlook <- glm(finaltable$formulary_drug_cd ~ finaltable$ethnicity + finaltable$mean.pain + finaltable$gender + finaltable$age + finaltable$insurance + finaltable$marital_status +finaltable$oasis + finaltable$e_score, family = binomial(link = "logit"))
 summary(secondlook)
 confint(secondlook)
 exp(coefficients(secondlook))
@@ -167,7 +186,9 @@ sjp.glm(secondlook)
 ```
 
 ```{r}
-year1secondlook <- glm(finaltable0205$formulary_drug_cd ~ finaltable0205$ethnicity + finaltable0205$mean.pain + finaltable0205$gender + finaltable0205$age + finaltable0205$insurance + finaltable0205$marital_status+finaltable0205$oasis, family = binomial(link = "logit"))
+#Adjusted model for year 1
+
+year1secondlook <- glm(finaltable0205$formulary_drug_cd ~ finaltable0205$ethnicity + finaltable0205$mean.pain + finaltable0205$gender + finaltable0205$age + finaltable0205$insurance + finaltable0205$marital_status+finaltable0205$oasis + finaltable0205$e_score, family = binomial(link = "logit"))
 summary(year1secondlook)
 confint(year1secondlook)
 exp(coefficients(year1secondlook))
@@ -176,7 +197,9 @@ sjp.glm(year1secondlook)
 ```
 
 ```{r}
-year2secondlook <- glm(finaltable0608$formulary_drug_cd ~ finaltable0608$ethnicity + finaltable0608$mean.pain + finaltable0608$gender + finaltable0608$age + finaltable0608$insurance + finaltable0608$marital_status+finaltable0608$oasis, family = binomial(link = "logit"))
+#Adjusted model for year 2
+
+year2secondlook <- glm(finaltable0608$formulary_drug_cd ~ finaltable0608$ethnicity + finaltable0608$mean.pain + finaltable0608$gender + finaltable0608$age + finaltable0608$insurance + finaltable0608$marital_status+finaltable0608$oasis + finaltable0608$e_score, family = binomial(link = "logit"))
 summary(year2secondlook)
 summary(year2secondlook)
 confint(year2secondlook)
@@ -186,7 +209,9 @@ sjp.glm(year2secondlook)
 ```
 
 ```{r}
-year3secondlook <- glm(finaltable0911$formulary_drug_cd ~ finaltable0911$ethnicity + finaltable0911$mean.pain + finaltable0911$gender + finaltable0911$age + finaltable0911$insurance + finaltable0911$marital_status +finaltable0911$oasis, family = binomial(link = "logit"))
+#Adjusted model for year 3
+
+year3secondlook <- glm(finaltable0911$formulary_drug_cd ~ finaltable0911$ethnicity + finaltable0911$mean.pain + finaltable0911$gender + finaltable0911$age + finaltable0911$insurance + finaltable0911$marital_status +finaltable0911$oasis +finaltable0911$e_score, family = binomial(link = "logit"))
 summary(year3secondlook)
 summary(year3secondlook)
 confint(year3secondlook)
