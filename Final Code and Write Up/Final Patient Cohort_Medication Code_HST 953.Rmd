@@ -109,18 +109,14 @@ for(i in 1:nrow(pain_table)){
 # Calculate mean, median, and max pain scores for each patient per hospital stay. Return histogram of findings.
 avg.pain <- aggregate(valuenum ~ hadm_id, data = pain_table, mean)
 colnames(avg.pain) = c("hadm_id", "mean.pain")
-qplot(x = round(mean.pain), data = avg.pain, geom = "histogram") + ggtitle("Avg Pain level Hist")
 
 max.pain <- aggregate(valuenum ~ hadm_id, data = pain_table, max)
 colnames(max.pain) = c("hadm_id", "max_pain")
 max.pain$max_pain <- as.numeric(max.pain$max_pain)
-qplot(x = max_pain, data = max.pain, geom = "histogram") + ggtitle(" Max Pain level Hist")
 
 med.pain <- aggregate(valuenum ~ hadm_id, data = pain_table, median)
 colnames(med.pain) = c("hadm_id", "med.pain")
 med.pain$med.pain <- as.numeric(med.pain$med.pain)
-
-qplot(x = med.pain, data = med.pain, geom = "histogram")
 ```
 
 
@@ -182,7 +178,6 @@ oxycodone <- dbGetQuery(con, "select * from Oxycodone")
 hydrocodone <- dbGetQuery(con, "select * from Hydrocodone")
 percocet <- dbGetQuery(con, "select * from Percocet")
 hydromorphone <- dbGetQuery(con, "select * from Hydromorphone")
-methadone <- dbGetQuery(con, "select * from Methadone")
 ```
 
 ```{r, cache = TRUE}
@@ -192,7 +187,6 @@ write.csv(oxycodone, file = "Oxycodone.csv")
 write.csv(hydrocodone, file = "Hydrocodone.csv")
 write.csv(percocet, file = "Percocet.csv")
 write.csv(hydromorphone, file = "Hydromorphone.csv")
-write.csv(methadone, file = "Methadone.csv")
 ```
 
 ```{r, cache = TRUE}
@@ -202,7 +196,6 @@ Morphine <- read_csv("~/SSmimic/Medication/Morphine.csv")
 Oxycodone <- read_csv("~/SSmimic/Medication/Oxycodone.csv")
 Percocet <- read_csv("~/SSmimic/Medication/Percocet.csv")
 Hydrocodone <- read_csv("~/SSmimic/Medication/Hydrocodone.csv")
-Methadone <- read_csv("~/SSmimic/Medication/Methadone.csv")
 ```
 
 ```{r}
@@ -213,7 +206,6 @@ Morph<- Morphine %>% distinct(hadm_id, .keep_all = TRUE)
 Oxycod<- Oxycodone %>% distinct(hadm_id, .keep_all = TRUE)
 Perco <- Percocet %>% distinct(hadm_id, .keep_all = TRUE)
 Hydrocod<- Hydrocodone %>% distinct(hadm_id, .keep_all = TRUE)
-Methad <- Methadone %>% distinct(hadm_id, .keep_all = TRUE)
 
 #create combined opioid medication table
 opioid <- rbind(Fent,Hydrom, Morph, Oxycod, Perco, Hydrocod)
@@ -240,11 +232,81 @@ write.csv(oralopioid_nodup,file = "oralopioid_nodup.csv")
 # Final Merge between patient cohort details (main.table.csv) and IV Opioid prescription information to ease analysis
 ```{r, cache = TRUE}
 finaltable <- left_join(main.table , IVtable_nodup, "hadm_id")
-finaltable <-  select(finaltable, "subject_id.y", "hadm_id", "icustay_id", "age", "gender", "ethnicity", "marital_status", "insurance", "los_hospital", "los_icu", "admityear", "mean.pain", "med.pain", "max_pain", "oasis", "e_score", "drug", "drug_name_generic", "formulary_drug_cd", "form_unit_disp", "route")
+finaltable <-  select(finaltable, "subject_id.y", "hadm_id", "icustay_id", "age", "gender", "ethnicity", "marital_status", "insurance", "los_hospital", "los_icu", "admityear", "mean.pain", "med.pain", "max_pain", "oasis", "e_score", "drug")
 colnames(finaltable)[1] <- "subject_id"
-write.csv(finaltable, file = "finaltable.csv")
 View(finaltable)
+```
+# Changing inaccurate drug codes 
+```{r}
+finaltable$drug[finaltable$drug == "D5W"] <- NA
+finaltable$drug[finaltable$drug == "Hydrocortisone Na Succinate"] <- NA
+finaltable$drug[finaltable$drug == "Soln."] <- NA
+finaltable$drug[finaltable$drug == "Soln"] <- NA
+finaltable$drug[finaltable$drug == "Hydrocortiso"] <- NA
+finaltable$drug[finaltable$drug == "Syringe"] <- NA
+finaltable$drug[finaltable$drug == "5% Dextrose"] <- NA
+```
 
+```{r}
+# Replacing NA to 0 and receiving an IV opioid to 1:
+finaltable$drug<- ifelse(is.na(finaltable$drug),0,1)
+View(finaltable)
+```
+
+#Writing finaltable .csv
+```{r}
+write.csv(finaltable, file = "finaltable.csv")
 # Sample size
 length(unique(finaltable$hadm_id))
 ```
+
+```{r}
+finaltable <- read_csv("~/SSmimic/Final Code and Write Up/finaltable.csv")
+```
+
+
+
+```{r}
+# categorize race into 4 categories
+
+finaltable$ethnicity <- ifelse(grepl("BLACK",finaltable$ethnicity),"BLACK", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("WHITE",finaltable$ethnicity),"WHITE", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("HISPANIC",finaltable$ethnicity),"HISPANIC", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("ASIAN",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("UN",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("MUL",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("INDIAN",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("SOUTH",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("ISLAND",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("DECL",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("EAST",finaltable$ethnicity),"OTHER", finaltable$ethnicity)
+finaltable$ethnicity <- ifelse(grepl("PORTU",finaltable$ethnicity),"HISPANIC", finaltable$ethnicity)
+
+finaltable$ethnicity[is.na(finaltable$ethnicity)]<-"OTHER"
+
+#categorize marital status into 4 categories 
+
+finaltable$marital_status <- ifelse(grepl("MARRIED",finaltable$marital_status),"MARRIED", finaltable$marital_status)
+finaltable$marital_status <- ifelse(grepl("LIFE PARTNER",finaltable$marital_status),"MARRIED", finaltable$marital_status)
+finaltable$marital_status <- ifelse(grepl("DIVORCED",finaltable$marital_status),"DIVORCED/WIDOWED", finaltable$marital_status)
+finaltable$marital_status <- ifelse(grepl("SEPARATED",finaltable$marital_status),"DIVORCED/WIDOWED", finaltable$marital_status)
+
+finaltable$marital_status <- ifelse(grepl("WIDOW",finaltable$marital_status),"DIVORCED/WIDOWED", finaltable$marital_status)
+finaltable$marital_status <- ifelse(grepl("UN",finaltable$marital_status),"OTHER", finaltable$marital_status)
+
+finaltable$marital_status[is.na(finaltable$marital_status)]<-"OTHER"
+
+#categorize insurance into 3 catergories
+
+finaltable$insurance <- ifelse(grepl("Medi",finaltable$insurance),"Government", finaltable$insurance)
+
+#check that ethnicity, marital status and insurance were correctly categorised
+
+unique(finaltable$ethnicity)
+
+unique(finaltable$marital_status)
+
+unique(finaltable$insurance)
+```
+
+
