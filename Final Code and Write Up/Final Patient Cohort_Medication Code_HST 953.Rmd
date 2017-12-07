@@ -238,7 +238,7 @@ write.csv(oralopioid_nodup,file = "oralopioid_nodup.csv")
 finaltable <- left_join(main.table , IVtable_nodup, "hadm_id")
 finaltable <-  select(finaltable, "subject_id.y", "hadm_id", "icustay_id", "age", "gender", "ethnicity", "marital_status", "insurance", "los_hospital", "los_icu", "admityear", "mean.pain", "med.pain", "max_pain", "oasis", "e_score", "drug")
 colnames(finaltable)[1] <- "subject_id"
-View(finaltable)
+unique(finaltable$drug)
 ```
 # Changing inaccurate drug codes 
 ```{r}
@@ -249,6 +249,7 @@ finaltable$drug[finaltable$drug == "Soln"] <- NA
 finaltable$drug[finaltable$drug == "Hydrocortiso"] <- NA
 finaltable$drug[finaltable$drug == "Syringe"] <- NA
 finaltable$drug[finaltable$drug == "5% Dextrose"] <- NA
+unique(finaltable$drug)
 ```
 
 ```{r}
@@ -259,16 +260,12 @@ View(finaltable)
 
 #Writing finaltable .csv
 ```{r}
+finaltable<- finaltable[!is.na(finaltable$admityear),]
 write.csv(finaltable, file = "finaltable.csv")
 # Sample size
 length(unique(finaltable$hadm_id))
 ```
 
-```{r}
-finaltable <- read_csv("~/SSmimic/Final Code and Write Up/finaltable.csv")
-finaltable<- finaltable[!is.na(finaltable$admityear),]
-
-```
 
 
 
