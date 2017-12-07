@@ -196,3 +196,6 @@ race_wh<- filter(finaltable,finaltable$ethnicity == "WHITE")
 b<- glm(race_wh$drug ~ race_wh$oasis)
 summary(b)
 ```
+
+
+- 
