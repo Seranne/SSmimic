@@ -159,7 +159,7 @@ write.csv(main.table, file = "Main Table.csv")
 ```
 
 ```{r, cache = TRUE}
-main.table <- read.csv("/SSMimic/Final Code and Write Up/Main Table.csv")
+main.table <- read_csv("~/SSmimic/Final Code and Write Up/main.table.csv")
 ```
 
 ```{r}
@@ -192,23 +192,23 @@ write.csv(methadone, file = "Methadone.csv")
 ```
 
 ```{r, cache = TRUE}
-Fentanyl <- read_csv("/SSmimic/Medication/Fentanyl.csv")
-Hydromorphone <- read_csv("/SSmimic/Medication/Hydromorphone.csv")
-Morphine <- read_csv("/SSmimic/Medication/Morphine.csv")
-Oxycodone <- read_csv("/SSmimic/Medication/Oxycodone.csv")
-Percocet <- read_csv("/SSmimic/Medication/Percocet.csv")
-Hydrocodone <- read_csv("/SSmimic/Medication/Hydrocodone.csv")
-Methadone <- read_csv("/SSmimic/Medication/Methadone.csv")
+Fentanyl <- read_csv("~/SSmimic/Medication/Fentanyl.csv")
+Hydromorphone <- read_csv("~/SSmimic/Medication/Hydromorphone.csv")
+Morphine <- read_csv("~/SSmimic/Medication/Morphine.csv")
+Oxycodone <- read_csv("~/SSmimic/Medication/Oxycodone.csv")
+Percocet <- read_csv("~/SSmimic/Medication/Percocet.csv")
+Hydrocodone <- read_csv("~/SSmimic/Medication/Hydrocodone.csv")
+Methadone <- read_csv("~/SSmimic/Medication/Methadone.csv")
 ```
 
 ```{r}
 #create tables with no duplicated hadm_id
-Fent<- Fentanyl %>% distinct(hadm_id, .keep_all = TRUE)
-Hydrom<- Hydromorphone %>% distinct(hadm_id, .keep_all = TRUE)
-Morph<- Morphine %>% distinct(hadm_id, .keep_all = TRUE)
-Oxycod<- Oxycodone %>% distinct(hadm_id, .keep_all = TRUE)
-Perco <- Percocet %>% distinct(hadm_id, .keep_all = TRUE)
-Hydrocod<- Hydrocodone %>% distinct(hadm_id, .keep_all = TRUE)
+Fent<- Fentanyl %>% distinct(hadm_id, .keep_all = TRUE) %>% select(., "X1", "subject_id", "hadm_id", "drug", "formulary_drug_cd", "drug_name_generic", "form_unit_disp", "route")
+Hydrom<- Hydromorphone %>% distinct(hadm_id, .keep_all = TRUE)%>% select(., "X1", "subject_id", "hadm_id", "drug", "formulary_drug_cd", "drug_name_generic", "form_unit_disp", "route")
+Morph<- Morphine %>% distinct(hadm_id, .keep_all = TRUE) %>% select(., "X1", "subject_id", "hadm_id", "drug", "formulary_drug_cd", "drug_name_generic", "form_unit_disp", "route")
+Oxycod<- Oxycodone %>% distinct(hadm_id, .keep_all = TRUE) %>% select(., "X1", "subject_id", "hadm_id", "drug", "formulary_drug_cd", "drug_name_generic", "form_unit_disp", "route")
+Perco <- Percocet %>% distinct(hadm_id, .keep_all = TRUE)%>% select(., "X1", "subject_id", "hadm_id", "drug", "formulary_drug_cd", "drug_name_generic", "form_unit_disp", "route")
+Hydrocod<- Hydrocodone %>% distinct(hadm_id, .keep_all = TRUE) %>% select(., "X1", "subject_id", "hadm_id", "drug", "formulary_drug_cd", "drug_name_generic", "form_unit_disp", "route")
 Meth <- Methadone %>% distinct(hadm_id, .keep_all = TRUE)
 
 #create combined opioid medication table
@@ -238,7 +238,7 @@ write.csv(oralopioid_nodup,file = "oralopioid_nodup.csv")
 finaltable <- left_join(main.table , IVtable_nodup, "hadm_id")
 finaltable <-  select(finaltable, "subject_id.y", "hadm_id", "icustay_id", "age", "gender", "ethnicity", "marital_status", "insurance", "los_hospital", "los_icu", "admityear", "mean.pain", "med.pain", "max_pain", "oasis", "e_score", "drug")
 colnames(finaltable)[1] <- "subject_id"
-View(finaltable)
+unique(finaltable$drug)
 ```
 # Changing inaccurate drug codes 
 ```{r}
@@ -249,6 +249,7 @@ finaltable$drug[finaltable$drug == "Soln"] <- NA
 finaltable$drug[finaltable$drug == "Hydrocortiso"] <- NA
 finaltable$drug[finaltable$drug == "Syringe"] <- NA
 finaltable$drug[finaltable$drug == "5% Dextrose"] <- NA
+unique(finaltable$drug)
 ```
 
 ```{r}
@@ -259,16 +260,12 @@ View(finaltable)
 
 #Writing finaltable .csv
 ```{r}
+finaltable<- finaltable[!is.na(finaltable$admityear),]
 write.csv(finaltable, file = "finaltable.csv")
 # Sample size
 length(unique(finaltable$hadm_id))
 ```
 
-```{r}
-finaltable <- read_csv("/SSmimic/Final Code and Write Up/finaltable.csv")
-finaltable<- finaltable[!is.na(finaltable$admityear),]
-
-```
 
 
 
