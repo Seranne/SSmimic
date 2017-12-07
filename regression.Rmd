@@ -45,7 +45,19 @@ sum(female$drug == "1")
 ```
 
 ```{r}
-unique(finaltable$insurance)
+sum(finaltable0205$ethnicity == "BLACK")
+sum(finaltable0205$ethnicity == "WHITE")
+sum(finaltable0205$ethnicity == "OTHER")
+sum(finaltable0205$ethnicity == "HISPANIC")
+sum(finaltable0608$ethnicity == "BLACK")
+sum(finaltable0608$ethnicity == "WHITE")
+sum(finaltable0608$ethnicity == "OTHER")
+sum(finaltable0608$ethnicity == "HISPANIC")
+sum(finaltable0911$ethnicity == "BLACK")
+sum(finaltable0911$ethnicity == "WHITE")
+sum(finaltable0911$ethnicity == "OTHER")
+sum(finaltable0911$ethnicity == "HISPANIC")
+
 ```
 
 
