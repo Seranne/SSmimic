@@ -44,6 +44,10 @@ female<- filter(finaltable, finaltable$gender == "F")
 sum(female$drug == "1")
 ```
 
+
+
+
+
 ```{r}
 sum(finaltable0205$ethnicity == "BLACK")
 sum(finaltable0205$ethnicity == "WHITE")
@@ -91,6 +95,14 @@ finaltable$marital_status<- as.factor(finaltable$marital_status)
 finaltable$ethnicity<- relevel(finaltable$ethnicity, ref = "WHITE")
 finaltable$marital_status<- relevel(finaltable$marital_status, ref = "MARRIED")
 ```
+
+
+```{r}
+library(tableone)
+finaltable <- mutate(finaltable, drug = as.factor(drug))
+CreateTableOne(vars = c("age", "drug", "gender", "insurance", "mean.pain", "oasis"), strata = "ethnicity", testApprox = chisq.test, data = finaltable)
+```
+
 
 
 #Crude association model taking all years into account
