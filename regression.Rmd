@@ -12,19 +12,52 @@ library(sjPlot)
 ```
 
 ```{r}
-finaltable <- read_csv("/SSmimic/Final Code and Write Up/finaltable.csv")
+finaltable <- read_csv("~/SSmimic/Final Code and Write Up/finaltable.csv")
 head(finaltable)
 unique(finaltable$drug)
 sum(finaltable$formulary_drug_cd == "1" )
 library(survival)
+finaltable0205<- filter(finaltable, finaltable$admityear == "2002" |finaltable$admityear == "2003" |finaltable$admityear == "2004" |finaltable$admityear == "2005" )
+finaltable0608<- filter(finaltable, finaltable$admityear == "2006" |finaltable$admityear == "2007" |finaltable$admityear == "2008")
+finaltable0911<- filter(finaltable, finaltable$admityear == "2009" |finaltable$admityear == "2010" |finaltable$admityear == "2011")
 ```
 
 ```{r}
-unique(finaltable)
+sum(finaltable$ethnicity == "BLACK")
+sum(finaltable$ethnicity == "WHITE")
+sum(finaltable$ethnicity == "OTHER")
+sum(finaltable$ethnicity == "HISPANIC")
+sum(finaltable$insurance == "Government")
+sum(finaltable$insurance == "Private")
+sum(finaltable$insurance == "Self Pay")
+sum(finaltable$gender == "F")
+sum(finaltable$gender == "M")
+summarize(finaltable, mean(oasis), sd(oasis))
+summarize(finaltable, mean(mean.pain), sd(mean.pain))
+ethnicgrouppain<- finaltable %>% group_by(ethnicity) %>% summarize(., mean(mean.pain), sd(mean.pain))
+ethnicgrouppain
+gendergrouppain<- finaltable %>% group_by(gender) %>% summarize(., mean(mean.pain), sd(mean.pain))
+gendergrouppain
+male<- filter(finaltable, finaltable$gender == "M")
+sum(male$drug == "1")
+female<- filter(finaltable, finaltable$gender == "F")
+sum(female$drug == "1")
 ```
 
 ```{r}
-unique(finaltable$insurance)
+sum(finaltable0205$ethnicity == "BLACK")
+sum(finaltable0205$ethnicity == "WHITE")
+sum(finaltable0205$ethnicity == "OTHER")
+sum(finaltable0205$ethnicity == "HISPANIC")
+sum(finaltable0608$ethnicity == "BLACK")
+sum(finaltable0608$ethnicity == "WHITE")
+sum(finaltable0608$ethnicity == "OTHER")
+sum(finaltable0608$ethnicity == "HISPANIC")
+sum(finaltable0911$ethnicity == "BLACK")
+sum(finaltable0911$ethnicity == "WHITE")
+sum(finaltable0911$ethnicity == "OTHER")
+sum(finaltable0911$ethnicity == "HISPANIC")
+
 ```
 
 
@@ -91,7 +124,7 @@ lines(finaltable$mean.pain, upper, lty = 2)
 ```{r}
 #Unadjusted regression for year 1
 
-finaltable0205<- filter(finaltable, finaltable$admityear == "2002" |finaltable$admityear == "2003" |finaltable$admityear == "2004" |finaltable$admityear == "2005" )
+#finaltable0205<- filter(finaltable, finaltable$admityear == "2002" |finaltable$admityear == "2003" |finaltable$admityear == "2004" |finaltable$admityear == "2005" )
 year2002_2005 <- ggplot(finaltable0205, aes(ethnicity, fill = drug == "1")) + 
                  geom_bar(position = "fill") + 
                  labs(x = "Ethnicity", fill = "Received IV Opioids")
@@ -108,7 +141,7 @@ sjp.glm(years1)
 ```{r}
 #Unadjusted regression for year 2
 
-finaltable0608<- filter(finaltable, finaltable$admityear == "2006" |finaltable$admityear == "2007" |finaltable$admityear == "2008")
+#finaltable0608<- filter(finaltable, finaltable$admityear == "2006" |finaltable$admityear == "2007" |finaltable$admityear == "2008")
 
 year2006_2008 <- ggplot(finaltable0608, aes(ethnicity, fill = drug == "1")) + 
                  geom_bar(position = "fill") + 
@@ -126,7 +159,7 @@ sjp.glm(years2)
 ```{r}
 #Unadjusted regression for year 3
 
-finaltable0911<- filter(finaltable, finaltable$admityear == "2009" |finaltable$admityear == "2010" |finaltable$admityear == "2011")
+#finaltable0911<- filter(finaltable, finaltable$admityear == "2009" |finaltable$admityear == "2010" |finaltable$admityear == "2011")
 year2009_2011 <- ggplot(finaltable0911, aes(ethnicity, fill = drug == "1")) + 
                  geom_bar(position = "fill") + 
                  labs(x = "Ethnicity", fill = "Received IV Opioids") 
