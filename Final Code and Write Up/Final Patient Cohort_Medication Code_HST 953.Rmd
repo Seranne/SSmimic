@@ -159,7 +159,7 @@ write.csv(main.table, file = "Main Table.csv")
 ```
 
 ```{r, cache = TRUE}
-main.table <- read.csv("~/SSMimic/Final Code and Write Up/Main Table.csv")
+main.table <- read_csv("~/SSmimic/Final Code and Write Up/main.table.csv")
 ```
 
 ```{r}
@@ -168,7 +168,7 @@ write.csv(main.table$hadm_id, "./cohort_hadmi_id.csv")
 ```
 
 ## Medication: Opioid Medications were defined to include: 
-Fentanyl, Remifentanil, Alfentanil, Sufentanil, Morphine, Oxycodone, Percocet, Hydrocodone, Hydrocodone Bitartrate, Oxycodone Hydrochloride, Hydromorphone Hydrochloride, and Methadone. SQL Codes for extracting these prescriptions from the table Prescriptions, are available from SQLCode.txt.
+Fentanyl, Remifentanil, Alfentanil, Sufentanil, Morphine, Oxycodone, Percocet, Hydrocodone, Hydrocodone Bitartrate, Oxycodone Hydrochloride, Hydromorphone Hydrochloride and Methadone. SQL Codes for extracting these prescriptions from the table Prescriptions, are available from SQLCode.txt.
 
 ```{r, echo = TRUE, cache = TRUE}
 # Extract drugs from Prescriptions, and write .csv files for each:
@@ -178,6 +178,7 @@ oxycodone <- dbGetQuery(con, "select * from Oxycodone")
 hydrocodone <- dbGetQuery(con, "select * from Hydrocodone")
 percocet <- dbGetQuery(con, "select * from Percocet")
 hydromorphone <- dbGetQuery(con, "select * from Hydromorphone")
+methadone <- dbGetQuery(con, "select * from Methadone")
 ```
 
 ```{r, cache = TRUE}
@@ -187,6 +188,7 @@ write.csv(oxycodone, file = "Oxycodone.csv")
 write.csv(hydrocodone, file = "Hydrocodone.csv")
 write.csv(percocet, file = "Percocet.csv")
 write.csv(hydromorphone, file = "Hydromorphone.csv")
+write.csv(methadone, file = "Methadone.csv")
 ```
 
 ```{r, cache = TRUE}
@@ -196,19 +198,21 @@ Morphine <- read_csv("~/SSmimic/Medication/Morphine.csv")
 Oxycodone <- read_csv("~/SSmimic/Medication/Oxycodone.csv")
 Percocet <- read_csv("~/SSmimic/Medication/Percocet.csv")
 Hydrocodone <- read_csv("~/SSmimic/Medication/Hydrocodone.csv")
+Methadone <- read_csv("~/SSmimic/Medication/Methadone.csv")
 ```
 
 ```{r}
 #create tables with no duplicated hadm_id
-Fent<- Fentanyl %>% distinct(hadm_id, .keep_all = TRUE)
-Hydrom<- Hydromorphone %>% distinct(hadm_id, .keep_all = TRUE)
-Morph<- Morphine %>% distinct(hadm_id, .keep_all = TRUE)
-Oxycod<- Oxycodone %>% distinct(hadm_id, .keep_all = TRUE)
-Perco <- Percocet %>% distinct(hadm_id, .keep_all = TRUE)
-Hydrocod<- Hydrocodone %>% distinct(hadm_id, .keep_all = TRUE)
+Fent<- Fentanyl %>% distinct(hadm_id, .keep_all = TRUE) %>% select(., "X1", "subject_id", "hadm_id", "drug", "formulary_drug_cd", "drug_name_generic", "form_unit_disp", "route")
+Hydrom<- Hydromorphone %>% distinct(hadm_id, .keep_all = TRUE)%>% select(., "X1", "subject_id", "hadm_id", "drug", "formulary_drug_cd", "drug_name_generic", "form_unit_disp", "route")
+Morph<- Morphine %>% distinct(hadm_id, .keep_all = TRUE) %>% select(., "X1", "subject_id", "hadm_id", "drug", "formulary_drug_cd", "drug_name_generic", "form_unit_disp", "route")
+Oxycod<- Oxycodone %>% distinct(hadm_id, .keep_all = TRUE) %>% select(., "X1", "subject_id", "hadm_id", "drug", "formulary_drug_cd", "drug_name_generic", "form_unit_disp", "route")
+Perco <- Percocet %>% distinct(hadm_id, .keep_all = TRUE)%>% select(., "X1", "subject_id", "hadm_id", "drug", "formulary_drug_cd", "drug_name_generic", "form_unit_disp", "route")
+Hydrocod<- Hydrocodone %>% distinct(hadm_id, .keep_all = TRUE) %>% select(., "X1", "subject_id", "hadm_id", "drug", "formulary_drug_cd", "drug_name_generic", "form_unit_disp", "route")
+Meth <- Methadone %>% distinct(hadm_id, .keep_all = TRUE)
 
 #create combined opioid medication table
-opioid <- rbind(Fent,Hydrom, Morph, Oxycod, Perco, Hydrocod)
+opioid <- rbind(Fent,Hydrom, Morph, Oxycod, Perco, Hydrocod, Meth)
 opioid_nohadmid<-  opioid %>% distinct(hadm_id, .keep_all = TRUE)
 
 #create csv
