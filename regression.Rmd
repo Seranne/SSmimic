@@ -59,7 +59,29 @@ sum(finaltable0911$ethnicity == "OTHER")
 sum(finaltable0911$ethnicity == "HISPANIC")
 
 ```
-
+# getting the numbers for all those who received IV opioids
+```{r}
+finaltable2<- filter(finaltable, finaltable$drug =="1")
+sum(finaltable2$ethnicity == "BLACK")
+sum(finaltable2$ethnicity == "WHITE")
+sum(finaltable2$ethnicity == "OTHER")
+sum(finaltable2$ethnicity == "HISPANIC")
+sum(finaltable2$insurance == "Government")
+sum(finaltable2$insurance == "Private")
+sum(finaltable2$insurance == "Self Pay")
+sum(finaltable2$gender == "F")
+sum(finaltable2$gender == "M")
+summarize(finaltable2, mean(oasis), sd(oasis))
+summarize(finaltable2, mean(mean.pain), sd(mean.pain))
+ethnicgrouppain2<- finaltable2 %>% group_by(ethnicity) %>% summarize(., mean(mean.pain), sd(mean.pain))
+ethnicgrouppain2
+gendergrouppain2<- finaltable2 %>% group_by(gender) %>% summarize(., mean(mean.pain), sd(mean.pain))
+gendergrouppain2
+male2<- filter(finaltable2, finaltable2$gender == "M")
+sum(male2$drug == "1")
+female2<- filter(finaltable2, finaltable2$gender == "F")
+sum(female2$drug == "1")
+```
 
 
 ```{r}
