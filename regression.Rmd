@@ -18,9 +18,43 @@ unique(finaltable$drug)
 sum(finaltable$formulary_drug_cd == "1" )
 library(survival)
 finaltable0205<- filter(finaltable, finaltable$admityear == "2002" |finaltable$admityear == "2003" |finaltable$admityear == "2004" |finaltable$admityear == "2005" )
+
 finaltable0608<- filter(finaltable, finaltable$admityear == "2006" |finaltable$admityear == "2007" |finaltable$admityear == "2008")
+
 finaltable0911<- filter(finaltable, finaltable$admityear == "2009" |finaltable$admityear == "2010" |finaltable$admityear == "2011")
+
+
+
+
 ```
+```{r}
+globalplot <- ggplot(finaltable, aes(ethnicity, fill = drug == "1")) + 
+                 geom_bar(position = "fill") + 
+                 labs(x = "Ethnicity", fill = "Received IV Opioids") +
+  ggtitle("Race based distribution of IV opioids")
+globalplot
+```
+
+
+```{r}
+length(unique(finaltable$subject_id))
+length(unique(finaltable$hadm_id))
+black<- filter(finaltable, finaltable$ethnicity == "BLACK")
+length(black$subject_id)
+length(black$hadm_id)
+white<- filter(finaltable, finaltable$ethnicity == "WHITE")
+length(unique(white$subject_id))
+length(unique(white$hadm_id))
+hispanic<- filter(finaltable, finaltable$ethnicity == "HISPANIC")
+length(unique(hispanic$subject_id))
+length(unique(hispanic$hadm_id))
+other<- filter(finaltable, finaltable$ethnicity == "OTHER")
+length(unique(other$subject_id))
+length(unique(other$hadm_id))
+```
+
+
+
 
 ```{r}
 sum(finaltable$ethnicity == "BLACK")
@@ -91,16 +125,25 @@ sum(female2$drug == "1")
 ```{r}
 finaltable$insurance<- as.factor(finaltable$insurance)
 finaltable$ethnicity<- as.factor(finaltable$ethnicity)
-finaltable$marital_status<- as.factor(finaltable$marital_status)
+finaltable0205$insurance<- as.factor(finaltable0205$insurance)
+finaltable0205$ethnicity<- as.factor(finaltable0205$ethnicity)
+finaltable0608$insurance<- as.factor(finaltable0608$insurance)
+finaltable0608$ethnicity<- as.factor(finaltable0608$ethnicity)
+finaltable0911$insurance<- as.factor(finaltable0911$insurance)
+finaltable0911$ethnicity<- as.factor(finaltable0911$ethnicity)
+
 finaltable$ethnicity<- relevel(finaltable$ethnicity, ref = "WHITE")
-finaltable$marital_status<- relevel(finaltable$marital_status, ref = "MARRIED")
+finaltable0911$ethnicity<- relevel(finaltable0911$ethnicity, ref = "WHITE")
+finaltable0608$ethnicity<- relevel(finaltable0608$ethnicity, ref = "WHITE")
+finaltable0205$ethnicity<- relevel(finaltable0205$ethnicity, ref = "WHITE")
+
 ```
 
 
 ```{r}
 library(tableone)
-finaltable <- mutate(finaltable, drug = as.factor(drug))
-CreateTableOne(vars = c("age", "drug", "gender", "insurance", "mean.pain", "oasis"), strata = "ethnicity", testApprox = chisq.test, data = finaltable)
+finaltablemutate <- mutate(finaltable, drug = as.factor(drug))
+CreateTableOne(vars = c("age", "drug", "gender", "insurance", "mean.pain", "oasis"), strata = "ethnicity", testApprox = chisq.test, data = finaltablemutate)
 ```
 
 
@@ -115,19 +158,11 @@ exp(confint(primarymodel))
 sjp.glm(primarymodel)
 ```
 
-```{r}
-firstlook <- glm(finaltable$drug ~ finaltable$ethnicity + finaltable$mean.pain, family = binomial(link = "logit"))
-summary(firstlook)
-confint(firstlook)
-exp(coefficients(firstlook))
-exp(confint(firstlook))
-sjp.glm(firstlook)
 
-```
 
 #Conditional Logistic Regression 
 ```{r}
-cond <- clogit(finaltable$drug ~ finaltable$age + strata(finaltable$mean.pain), method = "exact")
+#cond <- clogit(finaltable$drug ~ finaltable$age + strata(finaltable$mean.pain), method = "exact")
 ```
 
 #Predictive Probability plot 
@@ -158,7 +193,7 @@ lines(finaltable$mean.pain, upper, lty = 2)
 ```{r}
 #Unadjusted regression for year 1
 
-#finaltable0205<- filter(finaltable, finaltable$admityear == "2002" |finaltable$admityear == "2003" |finaltable$admityear == "2004" |finaltable$admityear == "2005" )
+finaltable0205<- filter(finaltable, finaltable$admityear == "2002" |finaltable$admityear == "2003" |finaltable$admityear == "2004" |finaltable$admityear == "2005" )
 year2002_2005 <- ggplot(finaltable0205, aes(ethnicity, fill = drug == "1")) + 
                  geom_bar(position = "fill") + 
                  labs(x = "Ethnicity", fill = "Received IV Opioids")
@@ -215,7 +250,8 @@ summary(secondlook)
 confint(secondlook)
 exp(coefficients(secondlook))
 exp(confint(secondlook))
-sjp.glm(secondlook)
+sjPlot::plot_model(secondlook, show.values = TRUE, axis.labels = c("OASIS", "Mean Pain","Self pay Insurance","Private Insurance", "Male", "Other Ethnicity","Hispanic", "Black" ,"Age"  )) + ggtitle("Odds ratios of predictors from fully Adjusted Model")
+ 
 ```
 
 ```{r}
@@ -226,7 +262,7 @@ summary(year1secondlook)
 confint(year1secondlook)
 exp(coefficients(year1secondlook))
 exp(confint(year1secondlook))
-sjp.glm(year1secondlook)
+sjPlot::plot_model(year1secondlook, show.values = TRUE, axis.labels = c("OASIS", "Mean Pain","Self pay Insurance","Private Insurance", "Male", "Other Ethnicity","Hispanic", "Black" ,"Age"  )) + ggtitle("Odds ratios of predictors from fully Adjusted Model 2002-2005")
 ```
 
 ```{r}
@@ -238,7 +274,7 @@ summary(year2secondlook)
 confint(year2secondlook)
 exp(coefficients(year2secondlook))
 exp(confint(year2secondlook))
-sjp.glm(year2secondlook)
+sjPlot::plot_model(year2secondlook, show.values = TRUE, axis.labels = c("OASIS", "Mean Pain","Self pay Insurance","Private Insurance", "Male", "Other Ethnicity","Hispanic", "Black" ,"Age"  )) + ggtitle("Odds ratios of predictors from fully Adjusted Model 2006-2008")
 ```
 
 ```{r}
@@ -250,7 +286,7 @@ summary(year3secondlook)
 confint(year3secondlook)
 exp(coefficients(year3secondlook))
 exp(confint(year3secondlook))
-sjp.glm(year3secondlook)
+sjPlot::plot_model(year3secondlook, show.values = TRUE, axis.labels = c("OASIS", "Mean Pain","Self pay Insurance","Private Insurance", "Male", "Other Ethnicity","Hispanic", "Black" ,"Age"  )) + ggtitle("Odds ratios of predictors from fully Adjusted Model 2009-2011")
 ```
 
 ```{r}
