@@ -143,7 +143,9 @@ finaltable0205$ethnicity<- relevel(finaltable0205$ethnicity, ref = "WHITE")
 ```{r}
 library(tableone)
 finaltablemutate <- mutate(finaltable, drug = as.factor(drug))
-CreateTableOne(vars = c("age", "drug", "gender", "insurance", "mean.pain", "oasis"), strata = "ethnicity", testApprox = chisq.test, data = finaltablemutate)
+finaltablemutate$gender<- as.factor(finaltablemutate$gender)
+finaltablemutate$gender<- relevel(finaltablemutate$gender, ref = "M")
+CreateTableOne(vars = c("age",  "gender", "insurance", "mean.pain", "oasis","ethnicity"),strata = "drug", testApprox = chisq.test, data = finaltablemutate)
 ```
 
 
@@ -249,8 +251,8 @@ secondlook <- glm(finaltable$drug ~ finaltable$ethnicity + finaltable$mean.pain 
 summary(secondlook)
 confint(secondlook)
 exp(coefficients(secondlook))
-exp(confint(secondlook))
-sjPlot::plot_model(secondlook, show.values = TRUE, axis.labels = c("OASIS", "Mean Pain","Self pay Insurance","Private Insurance", "Male", "Other Ethnicity","Hispanic", "Black" ,"Age"  )) + ggtitle("Odds ratios of predictors from fully Adjusted Model")
+
+sjPlot::plot_model(secondlook, show.values = TRUE, dot.size = 1, value.offset = 0.3, axis.labels = c("OASIS", "Mean Pain","Self pay Insurance","Private Insurance", "Male", "Other Ethnicity","Hispanic", "Black" ,"Age"  )) + ggtitle("Odds ratios of IV Opioid Prescription adjusting for all covariates")
  
 ```
 
