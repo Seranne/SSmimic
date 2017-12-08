@@ -264,7 +264,7 @@ summary(year1secondlook)
 confint(year1secondlook)
 exp(coefficients(year1secondlook))
 exp(confint(year1secondlook))
-sjPlot::plot_model(year1secondlook, show.values = TRUE, axis.labels = c("OASIS", "Mean Pain","Self pay Insurance","Private Insurance", "Male", "Other Ethnicity","Hispanic", "Black" ,"Age"  )) + ggtitle("Odds ratios of predictors from fully Adjusted Model 2002-2005")
+sjPlot::plot_model(year1secondlook, show.values = TRUE, dot.size = 1, value.offset = 0.3, axis.labels = c("OASIS", "Mean Pain","Self pay Insurance","Private Insurance", "Male", "Other Ethnicity","Hispanic", "Black" ,"Age"  )) + ggtitle("Odds ratios of IV Opioid Prescription 2002-2005")
 ```
 
 ```{r}
@@ -272,11 +272,10 @@ sjPlot::plot_model(year1secondlook, show.values = TRUE, axis.labels = c("OASIS",
 
 year2secondlook <- glm(finaltable0608$drug ~ finaltable0608$ethnicity + finaltable0608$mean.pain + finaltable0608$gender + finaltable0608$age + finaltable0608$insurance + finaltable0608$oasis, family = binomial(link = "logit"))
 summary(year2secondlook)
-summary(year2secondlook)
 confint(year2secondlook)
 exp(coefficients(year2secondlook))
 exp(confint(year2secondlook))
-sjPlot::plot_model(year2secondlook, show.values = TRUE, axis.labels = c("OASIS", "Mean Pain","Self pay Insurance","Private Insurance", "Male", "Other Ethnicity","Hispanic", "Black" ,"Age"  )) + ggtitle("Odds ratios of predictors from fully Adjusted Model 2006-2008")
+sjPlot::plot_model(year2secondlook, show.values = TRUE, dot.size = 1, value.offset = 0.3, axis.labels = c("OASIS", "Mean Pain","Self pay Insurance","Private Insurance", "Male", "Other Ethnicity","Hispanic", "Black" ,"Age"  )) + ggtitle("Odds ratios of IV Opioid Prescription 2006-2008")
 ```
 
 ```{r}
@@ -284,11 +283,10 @@ sjPlot::plot_model(year2secondlook, show.values = TRUE, axis.labels = c("OASIS",
 
 year3secondlook <- glm(finaltable0911$drug ~ finaltable0911$ethnicity + finaltable0911$mean.pain + finaltable0911$gender + finaltable0911$age + finaltable0911$insurance  + finaltable0911$oasis, family = binomial(link = "logit"))
 summary(year3secondlook)
-summary(year3secondlook)
 confint(year3secondlook)
 exp(coefficients(year3secondlook))
 exp(confint(year3secondlook))
-sjPlot::plot_model(year3secondlook, show.values = TRUE, axis.labels = c("OASIS", "Mean Pain","Self pay Insurance","Private Insurance", "Male", "Other Ethnicity","Hispanic", "Black" ,"Age"  )) + ggtitle("Odds ratios of predictors from fully Adjusted Model 2009-2011")
+sjPlot::plot_model(year3secondlook, show.values = TRUE, dot.size = 1, value.offset = 0.3, axis.labels = c("OASIS", "Mean Pain","Self pay Insurance","Private Insurance", "Male", "Other Ethnicity","Hispanic", "Black" ,"Age"  )) + ggtitle("Odds ratios of IV Opioid Prescription 2009-2011")
 ```
 
 ```{r}
