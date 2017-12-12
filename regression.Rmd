@@ -23,9 +23,6 @@ finaltable0608<- filter(finaltable, finaltable$admityear == "2006" |finaltable$a
 
 finaltable0911<- filter(finaltable, finaltable$admityear == "2009" |finaltable$admityear == "2010" |finaltable$admityear == "2011")
 
-
-
-
 ```
 ```{r}
 globalplot <- ggplot(finaltable, aes(ethnicity, fill = drug == "1")) + 
@@ -251,6 +248,7 @@ secondlook <- glm(finaltable$drug ~ finaltable$ethnicity + finaltable$mean.pain 
 summary(secondlook)
 confint(secondlook)
 exp(coefficients(secondlook))
+exp(confint(secondlook))
 
 sjPlot::plot_model(secondlook, show.values = TRUE, dot.size = 1, value.offset = 0.3, axis.labels = c("OASIS", "Mean Pain","Self pay Insurance","Private Insurance", "Male", "Other Ethnicity","Hispanic", "Black" ,"Age"  )) + ggtitle("Odds ratios of IV Opioid Prescription adjusting for all covariates")
  
@@ -298,6 +296,13 @@ summary(a)
 race_wh<- filter(finaltable,finaltable$ethnicity == "WHITE")
 b<- glm(race_wh$drug ~ race_wh$oasis)
 summary(b)
+```
+```{r}
+secondlook2 <- glm(finaltable$drug ~ finaltable$ethnicity + finaltable$mean.pain + finaltable$gender + finaltable$age + finaltable$insurance + finaltable$oasis + finaltable$insurance*finaltable$age, family = binomial(link = "logit"))
+summary(secondlook2)
+confint(secondlook2)
+exp(coefficients(secondlook2))
+exp(confint(secondlook2))
 ```
 
 
