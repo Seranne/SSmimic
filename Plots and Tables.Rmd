@@ -1,0 +1,124 @@
+---
+title: "Plots and Tables"
+author: "Shravanthi Seshasayee"
+date: "4 December 2017"
+output: html_document
+---
+Table 1: Summary -Ethnicity-specific, sex, age, hit, pain, elixhauser, oasis, insurance, MS
+Table 2: Unadjusted regression - for three catergories of years, between ethnicity and hit
+Table 3: Adjusted regression - overall and for three categories
+
+Plot 1: Unadjusted
+Plot 2: Adjusted 
+
+Interactive - trends across time?
+
+```{r}
+library(tableone)
+library(tidyverse)
+library(dplyr)
+read.csv("F://SSmimic/Final Code and Write Up/finaltable.csv")
+```
+
+
+
+# Should marital status and insurance be in the same model as ethnicity? I'd like to remove, they make the results harder to interpret (more variables, harder - e_score can also go )
+```{r}
+#adjusted global test for all the years
+
+finaltable$insurance<- as.factor(finaltable$insurance)
+finaltable$ethnicity<- as.factor(finaltable$ethnicity)
+finaltable$marital_status<- as.factor(finaltable$marital_status)
+finaltable$ethnicity<- relevel(finaltable$ethnicity, ref = "WHITE")
+finaltable$marital_status<- relevel(finaltable$marital_status, ref = "MARRIED")
+
+secondlook <- glm(finaltable$drug ~ finaltable$ethnicity + finaltable$mean.pain + finaltable$gender + finaltable$age +finaltable$oasis, family = binomial(link = "logit"))
+summary(secondlook)
+confint(secondlook)
+#sjp.glm(secondlook)
+
+secondlook$coefficients[2]
+secondlook$coefficients[3]
+secondlook$coefficients[4]
+
+```
+
+
+```{r}
+
+# Create labels
+boxLabels = c("Black", "Hispanic", "Other")
+
+# Enter summary data. boxOdds are the odds ratios (calculated elsewhere), boxCILow is the lower bound of the CI, boxCIHigh is the upper bound.
+
+df <- data.frame(
+  yAxis = length(boxLabels):1,
+  boxOdds = c(-0.3515534,-0.002075366, -0.1058666),
+  boxCILow = c(-0.431987951,-0.127186838, -0.173518623),
+  boxCIHigh = c(-0.2708931821, 0.1244000651, -0.0379375410)
+)
+
+# Plot
+p <- ggplot(df, aes(x = boxOdds, y = yAxis))
+p + geom_vline(aes(xintercept = 1), size = .25, linetype = "dashed") +
+  geom_errorbarh(aes(xmax = boxCIHigh, xmin = boxCILow), size = .5, height = .2, color = "gray50") +
+  geom_point(size = 3.5, color = "orange") +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank()) +
+  scale_y_continuous(breaks = yAxis, labels = boxLabels) +
+  scale_x_continuous(breaks = seq(0,7,1) ) +
+  coord_trans(x = "log10") +
+  ylab("") +
+  xlab("Odds ratio (log scale)") +
+  annotate(geom = "text", y =1.1, x = 3.5, label ="Model p < 0.001\nPseudo R^2 = 0.10", size = 3.5, hjust = 0) + ggtitle("Intention to remove box turtles from the road")
+
+
+
+```
+
+
+
+```{r}
+
+exp(coefficients(secondlook))
+intercept <- exp(secondlook$coef[1]) # intercept
+blk <- exp(secondlook$coef[2])
+hisp <- exp(secondlook$coef[3])
+othr <- exp(secondlook$coef[4])
+pain <- exp(secondlook$coef[5])
+male <- exp(secondlook$coef[6])
+age <- exp(secondlook$coef[7])
+oasis <- exp(secondlook$coef[8])
+```
+
+```{r}
+X1_range <- seq(from=min(data$X1), to=max(data$X1), by=.01)
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+omitted <- select(finaltable, "ethnicity", "formulary_drug_cd", "mean.pain")
+omitted <- na.omit(omitted)
+View(omitted)
+```
+
+
+```{r}
+CreateTableOne(vars=c("gender","age","formulary_drug_cd", group_by = "ethnicity"),data=finaltable)
+
+finaltable %>% group_by(ethnicity) %>% summarise(MeanAge = mean(age), Gender = gender )
+
+unique(finaltable$drug)
+```
+

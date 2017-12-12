@@ -264,5 +264,14 @@ b<- glm(race_wh$drug ~ race_wh$oasis)
 summary(b)
 ```
 
+# For the Regression paper 
+```{r}
+regfinal <- glm(finaltable$drug ~ finaltable$ethnicity + finaltable$mean.pain + finaltable$gender + finaltable$age + finaltable$insurance + finaltable$marital_status + finaltable$oasis, family = binomial(link = "logit"))
+summary(regfinal)
+confint(regfinal)
+exp(coefficients(regfinal))
+exp(confint(regfinal))
+sjp.glm(regfinal)
+```
 
 - 
