@@ -35,6 +35,7 @@ require("RPostgreSQL")
 library(stringr)
 library(tidyverse)
 library(readr)
+library(sjPlot)
 ```
 
 The first chunk of code allows R to connect to MIMIC database:
@@ -261,13 +262,12 @@ View(finaltable)
 #Writing finaltable .csv
 ```{r}
 finaltable<- finaltable[!is.na(finaltable$admityear),]
-write.csv(finaltable, file = "finaltable.csv")
 # Sample size
 length(unique(finaltable$hadm_id))
 ```
 
 
-
+#caterogerizing groups for the analysis
 
 ```{r}
 # categorize race into 4 categories
@@ -315,5 +315,261 @@ write.csv(finaltable, file = "finaltable.csv")
 
 
 ```
+We have now created a final table that can be ued for further analysis. WE will now do prelimnary checks and further subset the final table into yearly groups for yearly assessment of trends.
+
+```{r}
+head(finaltable)
+unique(finaltable$drug)
+sum(finaltable$drug == "1" )
+library(survival)
+finaltable0205<- filter(finaltable, finaltable$admityear == "2002" |finaltable$admityear == "2003" |finaltable$admityear == "2004" |finaltable$admityear == "2005" )
+
+finaltable0608<- filter(finaltable, finaltable$admityear == "2006" |finaltable$admityear == "2007" |finaltable$admityear == "2008")
+
+finaltable0911<- filter(finaltable, finaltable$admityear == "2009" |finaltable$admityear == "2010" |finaltable$admityear == "2011")
+
+```
+Plot showing overall distribution of IV opioid prescriptions among all ethnicities.
+
+```{r}
+globalplot <- ggplot(finaltable, aes(ethnicity, fill = drug == "1")) + 
+                 geom_bar(position = "fill") + 
+                 labs(x = "Ethnicity", fill = "Received IV Opioids") +
+  ggtitle("Race based distribution of IV opioids")
+globalplot
+```
+
+Getting the numbers of pateints and admissions in each group.
+
+```{r}
+length(unique(finaltable$subject_id))
+length(unique(finaltable$hadm_id))
+black<- filter(finaltable, finaltable$ethnicity == "BLACK")
+length(black$subject_id)
+length(black$hadm_id)
+white<- filter(finaltable, finaltable$ethnicity == "WHITE")
+length(unique(white$subject_id))
+length(unique(white$hadm_id))
+hispanic<- filter(finaltable, finaltable$ethnicity == "HISPANIC")
+length(unique(hispanic$subject_id))
+length(unique(hispanic$hadm_id))
+other<- filter(finaltable, finaltable$ethnicity == "OTHER")
+length(unique(other$subject_id))
+length(unique(other$hadm_id))
+```
+
+```{r}
+sum(finaltable$ethnicity == "BLACK")
+sum(finaltable$ethnicity == "WHITE")
+sum(finaltable$ethnicity == "OTHER")
+sum(finaltable$ethnicity == "HISPANIC")
+sum(finaltable$insurance == "Government")
+sum(finaltable$insurance == "Private")
+sum(finaltable$insurance == "Self Pay")
+sum(finaltable$gender == "F")
+sum(finaltable$gender == "M")
+summarize(finaltable, mean(oasis), sd(oasis))
+summarize(finaltable, mean(mean.pain), sd(mean.pain))
+```
+
+Establishing mean pain scores by ethnicity and gender
+
+```{r}
+ethnicgrouppain<- finaltable %>% group_by(ethnicity) %>% summarize(., mean(mean.pain), sd(mean.pain))
+ethnicgrouppain
+gendergrouppain<- finaltable %>% group_by(gender) %>% summarize(., mean(mean.pain), sd(mean.pain))
+gendergrouppain
+male<- filter(finaltable, finaltable$gender == "M")
+sum(male$drug == "1")
+female<- filter(finaltable, finaltable$gender == "F")
+sum(female$drug == "1")
+```
+
+Repeating the above twp processes but only for patients who received a prescription for IV opioids.
+
+```{r}
+finaltable2<- filter(finaltable, finaltable$drug =="1")
+sum(finaltable2$ethnicity == "BLACK")
+sum(finaltable2$ethnicity == "WHITE")
+sum(finaltable2$ethnicity == "OTHER")
+sum(finaltable2$ethnicity == "HISPANIC")
+sum(finaltable2$insurance == "Government")
+sum(finaltable2$insurance == "Private")
+sum(finaltable2$insurance == "Self Pay")
+sum(finaltable2$gender == "F")
+sum(finaltable2$gender == "M")
+summarize(finaltable2, mean(oasis), sd(oasis))
+summarize(finaltable2, mean(mean.pain), sd(mean.pain))
+ethnicgrouppain2<- finaltable2 %>% group_by(ethnicity) %>% summarize(., mean(mean.pain), sd(mean.pain))
+ethnicgrouppain2
+gendergrouppain2<- finaltable2 %>% group_by(gender) %>% summarize(., mean(mean.pain), sd(mean.pain))
+gendergrouppain2
+male2<- filter(finaltable2, finaltable2$gender == "M")
+sum(male2$drug == "1")
+female2<- filter(finaltable2, finaltable2$gender == "F")
+sum(female2$drug == "1")
+```
+
+Calculating number of patients in ethnicity throughout each of the year breakdowns.
+
+```{r}
+sum(finaltable0205$ethnicity == "BLACK")
+sum(finaltable0205$ethnicity == "WHITE")
+sum(finaltable0205$ethnicity == "OTHER")
+sum(finaltable0205$ethnicity == "HISPANIC")
+sum(finaltable0608$ethnicity == "BLACK")
+sum(finaltable0608$ethnicity == "WHITE")
+sum(finaltable0608$ethnicity == "OTHER")
+sum(finaltable0608$ethnicity == "HISPANIC")
+sum(finaltable0911$ethnicity == "BLACK")
+sum(finaltable0911$ethnicity == "WHITE")
+sum(finaltable0911$ethnicity == "OTHER")
+sum(finaltable0911$ethnicity == "HISPANIC")
+```
+
+Setting vectors as factors for regrssional analysis and setting the ethnic reference group to white (largest sample size).
 
 
+```{r}
+finaltable$insurance<- as.factor(finaltable$insurance)
+finaltable$ethnicity<- as.factor(finaltable$ethnicity)
+finaltable0205$insurance<- as.factor(finaltable0205$insurance)
+finaltable0205$ethnicity<- as.factor(finaltable0205$ethnicity)
+finaltable0608$insurance<- as.factor(finaltable0608$insurance)
+finaltable0608$ethnicity<- as.factor(finaltable0608$ethnicity)
+finaltable0911$insurance<- as.factor(finaltable0911$insurance)
+finaltable0911$ethnicity<- as.factor(finaltable0911$ethnicity)
+
+finaltable$ethnicity<- relevel(finaltable$ethnicity, ref = "WHITE")
+finaltable0911$ethnicity<- relevel(finaltable0911$ethnicity, ref = "WHITE")
+finaltable0608$ethnicity<- relevel(finaltable0608$ethnicity, ref = "WHITE")
+finaltable0205$ethnicity<- relevel(finaltable0205$ethnicity, ref = "WHITE")
+```
+
+Creating a table one for our study.
+
+```{r}
+library(tableone)
+finaltablemutate <- mutate(finaltable, drug = as.factor(drug))
+finaltablemutate$gender<- as.factor(finaltablemutate$gender)
+finaltablemutate$gender<- relevel(finaltablemutate$gender, ref = "M")
+CreateTableOne(vars = c("age",  "gender", "insurance", "mean.pain", "oasis","ethnicity"),strata = "drug", testApprox = chisq.test, data = finaltablemutate)
+```
+
+#Crude association model taking all years into account
+```{r}
+primarymodel <- glm(finaltable$drug ~ finaltable$ethnicity, family = binomial(link = "logit"))
+summary(primarymodel)
+confint(primarymodel)
+exp(coefficients(primarymodel))
+exp(confint(primarymodel))
+sjp.glm(primarymodel)
+```
+
+#Unadjusted(crude) regression for grouped year 1
+
+```{r}
+
+year2002_2005 <- ggplot(finaltable0205, aes(ethnicity, fill = drug == "1")) + 
+                 geom_bar(position = "fill") + 
+                 labs(x = "Ethnicity", fill = "Received IV Opioids")
+year2002_2005
+
+years1 <- glm(finaltable0205$drug ~ finaltable0205$ethnicity, family = binomial(link = "logit"))
+summary(years1)
+confint(years1)
+exp(coefficients(years1))
+exp(confint(years1))
+sjp.glm(years1)
+```
+
+#Unadjusted(crude) regression for grouped year 2
+
+```{r}
+
+year2006_2008 <- ggplot(finaltable0608, aes(ethnicity, fill = drug == "1")) + 
+                 geom_bar(position = "fill") + 
+                 labs(x = "Ethnicity", fill = "Received IV Opioids") 
+
+year2006_2008
+years2 <- glm(finaltable0608$drug ~ finaltable0608$ethnicity, family = binomial(link = "logit"))
+summary(years2)
+confint(years2)
+exp(coefficients(years2))
+exp(confint(years2))
+sjp.glm(years2)
+```
+
+#Unadjusted(crude) regression for grouped year 3
+
+```{r}
+year2009_2011 <- ggplot(finaltable0911, aes(ethnicity, fill = drug == "1")) + 
+                 geom_bar(position = "fill") + 
+                 labs(x = "Ethnicity", fill = "Received IV Opioids") 
+year2009_2011
+
+years3 <- glm(finaltable0911$drug ~ finaltable0911$ethnicity, family = binomial(link = "logit"))
+summary(years3)
+confint(years3)
+exp(coefficients(years3))
+exp(confint(years3))
+sjp.glm(years3)
+```
+
+#Fully adjusted global model for all years
+
+```{r}
+
+
+secondlook <- glm(finaltable$drug ~ finaltable$ethnicity + finaltable$mean.pain + finaltable$gender + finaltable$age + finaltable$insurance + finaltable$oasis, family = binomial(link = "logit"))
+summary(secondlook)
+confint(secondlook)
+exp(coefficients(secondlook))
+exp(confint(secondlook))
+
+sjPlot::plot_model(secondlook, show.values = TRUE, dot.size = 1, value.offset = 0.3, axis.labels = c("OASIS", "Mean Pain","Self pay Insurance","Private Insurance", "Male", "Other Ethnicity","Hispanic", "Black" ,"Age"  )) + ggtitle("Odds ratios of IV Opioid Prescription adjusting for all covariates")
+ 
+```
+#Adjusted model for year 1
+
+```{r}
+year1secondlook <- glm(finaltable0205$drug ~ finaltable0205$ethnicity + finaltable0205$mean.pain + finaltable0205$gender + finaltable0205$age + finaltable0205$insurance + finaltable0205$oasis, family = binomial(link = "logit"))
+summary(year1secondlook)
+confint(year1secondlook)
+exp(coefficients(year1secondlook))
+exp(confint(year1secondlook))
+sjPlot::plot_model(year1secondlook, show.values = TRUE, dot.size = 1, value.offset = 0.3, axis.labels = c("OASIS", "Mean Pain","Self pay Insurance","Private Insurance", "Male", "Other Ethnicity","Hispanic", "Black" ,"Age"  )) + ggtitle("Odds ratios of IV Opioid Prescription 2002-2005")
+```
+
+#Adjusted model for year 2
+```{r}
+
+year2secondlook <- glm(finaltable0608$drug ~ finaltable0608$ethnicity + finaltable0608$mean.pain + finaltable0608$gender + finaltable0608$age + finaltable0608$insurance + finaltable0608$oasis, family = binomial(link = "logit"))
+summary(year2secondlook)
+confint(year2secondlook)
+exp(coefficients(year2secondlook))
+exp(confint(year2secondlook))
+sjPlot::plot_model(year2secondlook, show.values = TRUE, dot.size = 1, value.offset = 0.3, axis.labels = c("OASIS", "Mean Pain","Self pay Insurance","Private Insurance", "Male", "Other Ethnicity","Hispanic", "Black" ,"Age"  )) + ggtitle("Odds ratios of IV Opioid Prescription 2006-2008")
+```
+
+
+#Adjusted model for year 3
+```{r}
+year3secondlook <- glm(finaltable0911$drug ~ finaltable0911$ethnicity + finaltable0911$mean.pain + finaltable0911$gender + finaltable0911$age + finaltable0911$insurance  + finaltable0911$oasis, family = binomial(link = "logit"))
+summary(year3secondlook)
+confint(year3secondlook)
+exp(coefficients(year3secondlook))
+exp(confint(year3secondlook))
+sjPlot::plot_model(year3secondlook, show.values = TRUE, dot.size = 1, value.offset = 0.3, axis.labels = c("OASIS", "Mean Pain","Self pay Insurance","Private Insurance", "Male", "Other Ethnicity","Hispanic", "Black" ,"Age"  )) + ggtitle("Odds ratios of IV Opioid Prescription 2009-2011")
+```
+
+
+Cheching for potential interaction between age and insurance
+
+```{r}
+secondlook2 <- glm(finaltable$drug ~ finaltable$ethnicity + finaltable$mean.pain + finaltable$gender + finaltable$age + finaltable$insurance + finaltable$oasis + finaltable$insurance*finaltable$age, family = binomial(link = "logit"))
+summary(secondlook2)
+confint(secondlook2)
+exp(coefficients(secondlook2))
+exp(confint(secondlook2))
+```
