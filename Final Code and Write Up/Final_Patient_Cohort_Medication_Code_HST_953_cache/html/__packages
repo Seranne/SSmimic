@@ -1,0 +1,16 @@
+base
+ggplot2
+nlme
+mgcv
+dplyr
+DBI
+RPostgreSQL
+stringr
+tidyverse
+tibble
+tidyr
+readr
+purrr
+forcats
+sjPlot
+bindrcpp
