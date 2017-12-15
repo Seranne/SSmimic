@@ -1,0 +1,39 @@
+---
+title: "Reg Final"
+author: "Seranne Motital, Shravanthi Seshasayee"
+date: "15 December 2017"
+output: html_document
+---
+```{r}
+library(readr)
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(sjPlot)
+library(tableone)
+```
+
+```{r}
+finaltable <- read_csv("/SSmimic/Final Code and Write Up/finaltable.csv")
+```
+
+```{r}
+finaltable$marital_status <- as.factor(finaltable$marital_status)
+finaltable$marital_status <- relevel(finaltable$marital_status, ref = "SINGLE")
+output <- glm(formula = finaltable$drug ~ finaltable$ethnicity + finaltable$mean.pain + 
+    finaltable$gender + finaltable$age + finaltable$insurance + 
+    finaltable$marital_status + finaltable$oasis, family = binomial(link = "logit"))
+summary(output)
+confint(output)
+exp(coefficients(output))
+exp(confint(output))
+```
+```{r}
+p <- finaltable %>% ggplot(aes(ethnicity, drug)) + geom_point() + geom_smooth()
+p
+```
+
+```{r}
+CreateTableOne(vars = c("age",  "gender", "insurance", "mean.pain", "oasis","ethnicity", "marital_status"),strata = "drug", testApprox = chisq.test, data = finaltable)
+```
+
